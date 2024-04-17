@@ -6,11 +6,77 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
+	"strings"
 
+	tea "github.com/charmbracelet/bubbletea"
 	containertypes "github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 )
+
+type containerDetail struct {
+	Name string
+}
+
+type modelContainer struct {
+	cursor int
+	choice string
+}
+
+var choicesContainers = []string{}
+
+func (m modelContainer) Init() tea.Cmd {
+	return nil
+}
+
+func (m modelContainer) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "q", "esc":
+			return m, tea.Quit
+
+		case "enter":
+			// Send the choice on the channel and exit.
+			m.choice = choicesContainers[m.cursor]
+			return m, tea.Quit
+
+		case "down", "j":
+			m.cursor++
+			if m.cursor >= len(choicesContainers) {
+				m.cursor = 0
+			}
+
+		case "up", "k":
+			m.cursor--
+			if m.cursor < 0 {
+				m.cursor = len(choicesContainers) - 1
+			}
+		}
+	}
+
+	return m, nil
+}
+
+func (m modelContainer) View() string {
+	s := strings.Builder{}
+	s.WriteString("\nWhich container would you like to stop?\n\n")
+
+	for i := 0; i < len(choicesContainers); i++ {
+		if m.cursor == i {
+			s.WriteString("(*) ")
+		} else {
+			s.WriteString("( ) ")
+		}
+		s.WriteString(choicesContainers[i])
+		s.WriteString("\n")
+	}
+	s.WriteString("\n(press q to quit)\n")
+
+	return s.String()
+}
 
 // stopCmd represents the stop command
 var stopCmd = &cobra.Command{
@@ -25,8 +91,42 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		nameFlag, _ := cmd.Flags().GetString("name")
 		if nameFlag == "" {
-			fmt.Print("\nEnter the name of the container: ")
-			fmt.Scanln(&nameFlag)
+			containerInfo, err := containerNames()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			for _, container := range containerInfo {
+				choicesContainers = append(choicesContainers, container.Name)
+			}
+
+			if len(choicesContainers) == 0 {
+				fmt.Println("No running containers found!")
+				return
+			}
+			p := tea.NewProgram(modelContainer{})
+
+			m, err := p.Run()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		
+			if m, ok := m.(modelContainer); ok && m.choice != "" {
+				nameFlag = strings.ToLower(m.choice)
+			}
+
+			indexToRemove := -1
+			for i, v := range choicesContainers {
+				if v == nameFlag {
+					indexToRemove = i
+					break
+				}
+			}
+
+			if indexToRemove != -1 {
+				_ = append(choicesContainers[:indexToRemove], choicesContainers[indexToRemove+1:]...)
+			}
 		}
 		msg, err := stopcontainer(nameFlag)
 		if err != nil {
@@ -68,5 +168,29 @@ func stopcontainer(name string) (string, error) {
 			return "", err
 		}
 	}
-	return "Stopped container: " + contInfo.ID, nil
+	return "Stopped container: " + contInfo.ID[:10], nil
+}
+
+func containerNames() ([]containerDetail, error) {
+	containerlist := []containerDetail{}
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+
+	filters := filters.NewArgs(filters.Arg("label", "createdBy=instacode"))
+	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{Filters: filters})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, container := range containers {
+		containerlist = append(containerlist, containerDetail{
+			Name:   container.Names[0][1:],
+		})
+	}
+
+	return containerlist, nil
 }

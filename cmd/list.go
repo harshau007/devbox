@@ -182,6 +182,9 @@ func listContainers() ([]ContainerInfo, error) {
 		if len(container.Ports) > 0 {
 			url = fmt.Sprintf("http://%s:%d", container.Ports[0].IP, container.Ports[0].PublicPort)
 		}
+		if url == "" {
+			url = "Not Available"			
+		}
 		containerlist = append(containerlist, ContainerInfo{
 			ID:     container.ID[:10],
 			Name:   container.Names[0][1:],
