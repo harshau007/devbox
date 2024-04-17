@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Start from port 8080
+port=8080
+
+container_name="$1"
+# Function to check if a port is in use
+is_port_in_use() {
+    netstat -ltn | grep -q ":$port"
+}
+
+# Find an available port
+while is_port_in_use $port; do
+    port=$((port+1))
+done
+
+image=$(docker inspect --format='{{.Config.Image}}' $container_name)
+
+volume=$(docker inspect --format='{{range .Mounts}}{{.Source}}{{end}}' $container_name)
+
+docker commit $container_name $image
+
+docker rm $container_name
+
+docker run --name $container_name -p $port:8080 -v "$volume:/home/coder" --privileged -d $image
