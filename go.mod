@@ -3,6 +3,7 @@ module github.com/harshau007/devc
 go 1.22.2
 
 require (
+	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/charmbracelet/lipgloss v0.9.1
 	github.com/docker/docker v26.0.1+incompatible

@@ -168,7 +168,7 @@ func stopcontainer(name string) (string, error) {
 			return "", err
 		}
 	}
-	return "Stopped container: " + contInfo.ID[:10], nil
+	return "\nStopped container: " + contInfo.ID[:10] + "\n", nil
 }
 
 func containerNames() ([]containerDetail, error) {

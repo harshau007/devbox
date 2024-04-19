@@ -3,14 +3,17 @@ Copyright © 2024 Harsh Upadhyay amanupadhyay2004@gmail.com
 */
 package cmd
 
-import (	
+import (
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 
-	"github.com/spf13/cobra"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/spf13/cobra"
 )
 
 type CreateContainer struct {
@@ -38,7 +41,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
-			// Send the choice on the channel and exit.
 			m.choice = choices[m.cursor]
 			return m, tea.Quit
 
@@ -77,6 +79,58 @@ func (m model) View() string {
 	return s.String()
 }
 
+type loaderModel struct {
+    spinner  spinner.Model
+    quitting bool
+    err      error
+    id       string
+    done     bool
+    mutex    sync.Mutex
+}
+
+func initialModel() loaderModel {
+    s := spinner.New()
+    s.Spinner = spinner.Dot
+    s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#480ca8"))
+    return loaderModel{spinner: s}
+}
+
+func (m *loaderModel) Init() tea.Cmd {
+    return m.spinner.Tick
+}
+
+func (m *loaderModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+    switch msg := msg.(type) {
+    case tea.KeyMsg:
+        switch msg.String() {
+        case "ctrl+c", "q":
+            m.quitting = true
+            return m, tea.Quit
+        default:
+            return m, nil
+        }
+
+    case spinner.TickMsg:
+        var cmd tea.Cmd
+        m.spinner, cmd = m.spinner.Update(msg)
+        return m, cmd
+
+    default:
+        return m, nil
+    }
+}
+
+func (m *loaderModel) View() string {
+    if m.err != nil {
+        return m.err.Error()
+    }
+    str := fmt.Sprintf("\n  %s Creating Code Instance... \n\n", m.spinner.View())
+    if m.id != "" {
+        str += fmt.Sprintf("Container created with ID: %s\n", m.id)
+    }
+    return str
+}
+
 var createcmd = &cobra.Command{
 	Use:   "create",
 	Short: "A brief description of your application",
@@ -93,12 +147,12 @@ to quickly create a Cobra application.`,
 		volFlag, _ := cmd.Flags().GetString("volume")
 
 		if nameFlag == "" {
-			fmt.Print("\nEnter the name of the container: ")
+			fmt.Print("Enter the name of the container: ")
 			fmt.Scanln(&nameFlag)
 		}
 
 		if volFlag == "" {
-			fmt.Print("\nEnter folder path: $HOME/")
+			fmt.Print("Enter folder path: $HOME/")
 			fmt.Scanln(&volFlag)
 		}
 
@@ -130,16 +184,49 @@ to quickly create a Cobra application.`,
 }
 
 func createCodeInstance(container CreateContainer) (string, error) {
-    cmd := exec.Command("./port", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath))
-    output, err := cmd.CombinedOutput()
-    if err != nil {
-        fmt.Printf("Error executing the script: %v\n", err)
-        return "", err
-    }
+    m := initialModel()
+    p := tea.NewProgram(&m)
+    var wg sync.WaitGroup
+    wg.Add(1)
+    done := make(chan struct{})
 
-    outputLines := strings.Split(strings.TrimSpace(string(output)), "\n")
-    containerId := outputLines[len(outputLines)-1]
-    fmt.Printf("\nContainer created with ID: %s\n", containerId)
+    go func() {
+        defer wg.Done()
+        cmd := exec.Command("./port", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath))
+        output, err := cmd.CombinedOutput()
+        if err != nil {
+            m.mutex.Lock()
+            m.err = fmt.Errorf("error executing the script: %v", err)
+            m.mutex.Unlock()
+            close(done)
+            return
+        }
 
-    return containerId[:10], nil
+        outputLines := strings.Split(strings.TrimSpace(string(output)), "\n")
+        containerId := outputLines[len(outputLines)-1]
+
+        m.mutex.Lock()
+        m.id = containerId[:10]
+        m.done = true
+        m.mutex.Unlock()
+        close(done)
+    }()
+
+    go func() {
+        for {
+            select {
+            case <-done:
+                p.Kill()
+                return
+            default:
+                _, err := p.Run()
+                if err != nil {
+                    return
+                }
+            }
+        }
+    }()
+
+    wg.Wait()
+    return m.id, m.err
 }
