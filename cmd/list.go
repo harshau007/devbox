@@ -17,7 +17,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// docker ps -a --filter "label=createdBy=instacode"
+// docker ps -a --filter "label=createdBy=devcraft"
 
 type ContainerInfo struct {
 	ID     string
@@ -171,7 +171,7 @@ func listContainers() ([]ContainerInfo, error) {
 	}
 	defer cli.Close()
 
-	filters := filters.NewArgs(filters.Arg("label", "createdBy=instacode"))
+	filters := filters.NewArgs(filters.Arg("label", "createdBy=devcraft"))
 	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: true, Filters: filters})
 	if err != nil {
 		return nil, err

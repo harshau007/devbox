@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 LABEL maintainer="https://github.com/harshau007"
-LABEL createdBy="instacode"
+LABEL createdBy="devcraft"
 
 RUN apt-get update && apt-get install -y curl ca-certificates software-properties-common
 
