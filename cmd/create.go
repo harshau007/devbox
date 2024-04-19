@@ -91,7 +91,7 @@ type loaderModel struct {
 func initialModel() loaderModel {
     s := spinner.New()
     s.Spinner = spinner.Dot
-    s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#480ca8"))
+    s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#ffffff"))
     return loaderModel{spinner: s}
 }
 
