@@ -9,7 +9,7 @@ fi
 
 image_name="$container_name-$(head /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)"
 
-docker build --build-arg ADDITIONAL_PACKAGES="$2" . -t $image_name -f /usr/share/devcraft/dockerfile
+docker build --build-arg ADDITIONAL_PACKAGES="$2" . -t $image_name -f $HOME/.devcraft/dockerfile
 
 # Start from port 8080
 port=8080
