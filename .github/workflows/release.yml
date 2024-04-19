@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag'
+        required: false
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Building Calamares Tar file
+        run: |
+          cd ..
+          touch calamares-${{ inputs.tag }}.tar.gz
+          tar -czf calamares-${{ inputs.tag }}.tar.gz calamares/
+          touch checksum
+          sha256sum calamares-${{ inputs.tag }}.tar.gz > checksum
+          mv checksum calamares/
+          mv calamares-${{ inputs.tag }}.tar.gz calamares/
+
+      - name: Checking if release with date tag exist
+        run: |
+          tag=${{ inputs.tag }}
+          if gh release view $tag; then
+            echo "RELEASE_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+      - name: Checking if release with latest tag exist
+        run: |
+          tag=latest
+          if gh release view $tag; then
+            echo "LATEST_RELEASE_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "LATEST_RELEASE_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+      - name: Deleting Dated release
+        if: env.RELEASE_EXISTS == 'true'
+        run: |
+          gh release delete 'v${{ inputs.tag }}'
+
+      - name: Delete Previous Latest release
+        if: env.LATEST_RELEASE_EXISTS == 'true'
+        run: |
+          gh release delete latest
+      - name: Release Tar File
+        run: |
+          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "Calamares"
+      - name: Release Tar File with latest
+        run: |
+          gh release create latest *tar.gz checksum --latest --title "Calamares"
