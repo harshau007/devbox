@@ -113,7 +113,7 @@ func containerList() ([]containerDetail, error) {
 	defer cli.Close()
 
 	filters := filters.NewArgs(
-		filters.Arg("label", "createdBy=devcraft"),
+		filters.Arg("label", "createdBy=instacode"),
 		filters.Arg("status", "exited"),
 	)
 	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{Filters: filters})

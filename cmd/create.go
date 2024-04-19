@@ -63,7 +63,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	s := strings.Builder{}
-	s.WriteString("\nWhich package would you like?\n\n")
+	s.WriteString("Which package would you like?\n\n")
 
 	for i := 0; i < len(choices); i++ {
 		if m.cursor == i {
