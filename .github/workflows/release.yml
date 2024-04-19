@@ -23,15 +23,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Building Calamares Tar file
+      - name: Building DevCraft Tar file
         run: |
           cd ..
-          touch calamares-${{ inputs.tag }}.tar.gz
-          tar -czf calamares-${{ inputs.tag }}.tar.gz calamares/
+          touch devcraft-${{ inputs.tag }}.tar.gz
+          tar -czf devcraft-${{ inputs.tag }}.tar.gz devcraft/
           touch checksum
-          sha256sum calamares-${{ inputs.tag }}.tar.gz > checksum
-          mv checksum calamares/
-          mv calamares-${{ inputs.tag }}.tar.gz calamares/
+          sha256sum devcraft-${{ inputs.tag }}.tar.gz > checksum
+          mv checksum devcraft/
+          mv devcraft-${{ inputs.tag }}.tar.gz devcraft/
 
       - name: Checking if release with date tag exist
         run: |
@@ -62,7 +62,7 @@ jobs:
           gh release delete latest
       - name: Release Tar File
         run: |
-          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "Calamares"
+          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "DevCraft"
       - name: Release Tar File with latest
         run: |
-          gh release create latest *tar.gz checksum --latest --title "Calamares"
+          gh release create latest *tar.gz checksum --latest --title "DevCraft"
