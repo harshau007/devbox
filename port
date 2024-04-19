@@ -9,6 +9,8 @@ fi
 
 image_name="$container_name-$(head /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)"
 
+cp -r /usr/local/share/devcraft/settings.json .
+
 docker build --build-arg ADDITIONAL_PACKAGES="$2" . -t $image_name -f /usr/local/share/devcraft/dockerfile
 
 # Start from port 8080
@@ -28,3 +30,5 @@ echo "Launching $container_name on port $port and mounting $3"
 
 # Run the Docker container with the available port
 docker run --name "$container_name" -p $port:8080 -v "$3:/home/coder" --privileged -d $image_name
+
+rm -rf settings.json
