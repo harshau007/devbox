@@ -192,7 +192,7 @@ func createCodeInstance(container CreateContainer) (string, error) {
 
     go func() {
         defer wg.Done()
-        cmd := exec.Command("./port", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath))
+        cmd := exec.Command("port", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath))
         output, err := cmd.CombinedOutput()
         if err != nil {
             m.mutex.Lock()
