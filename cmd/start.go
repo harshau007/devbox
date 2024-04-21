@@ -98,7 +98,7 @@ func startContainer(name string) (string, error) {
 
 	outputLines := strings.Split(strings.TrimSpace(string(output)), "\n")
 	containerId := outputLines[len(outputLines)-1]
-	fmt.Printf("Container created with ID: %s\n", containerId[:10])
+	fmt.Printf("\nContainer created with ID: %s\n", containerId[:10])
 
 	return "", nil
 }
