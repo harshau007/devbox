@@ -17,7 +17,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// docker ps -a --filter "label=createdBy=devcraft"
+// docker ps -a --filter "label=createdBy=DevControl"
 
 type ContainerInfo struct {
 	ID     string
@@ -56,7 +56,6 @@ func (m *modelTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m modelTable) View() string {
 	return "\n" + m.table.String() + "\n(press q to quit)\n"
 }
-
 
 func (m *modelTable) initTable() {
 	re := lipgloss.NewRenderer(os.Stdout)
@@ -99,36 +98,36 @@ func (m *modelTable) initTable() {
 		rows[i] = []string{container.ID, container.Name, container.Image, container.Status, container.Volume, container.Url}
 	}
 
-	m.table = table.New().Headers(columns...).Rows(rows...).Height(len(m.containerList)+2).Border(lipgloss.NormalBorder()).
-	BorderStyle(re.NewStyle().Foreground(lipgloss.Color("238"))).
-	StyleFunc(func(row, col int) lipgloss.Style {
-		if row == 0 {
-			return headerStyle
-		}
-
-		if rows[row-1][1] == "Pikachu" {
-			return selectedStyle
-		}
-
-		even := row%2 == 0
-
-		switch col {
-		case 2, 3: 
-			c := typeColors
-			if even {
-				c = dimTypeColors
+	m.table = table.New().Headers(columns...).Rows(rows...).Height(len(m.containerList) + 2).Border(lipgloss.NormalBorder()).
+		BorderStyle(re.NewStyle().Foreground(lipgloss.Color("238"))).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			if row == 0 {
+				return headerStyle
 			}
 
-			color := c[fmt.Sprint(rows[row-1][col])]
-			return baseStyle.Copy().Foreground(color)
-		}
+			if rows[row-1][1] == "Pikachu" {
+				return selectedStyle
+			}
 
-		if even {
+			even := row%2 == 0
+
+			switch col {
+			case 2, 3:
+				c := typeColors
+				if even {
+					c = dimTypeColors
+				}
+
+				color := c[fmt.Sprint(rows[row-1][col])]
+				return baseStyle.Copy().Foreground(color)
+			}
+
+			if even {
+				return baseStyle.Copy().Foreground(lipgloss.Color("252"))
+			}
 			return baseStyle.Copy().Foreground(lipgloss.Color("252"))
-		}
-		return baseStyle.Copy().Foreground(lipgloss.Color("252"))
-	}).
-	Border(lipgloss.ThickBorder())
+		}).
+		Border(lipgloss.ThickBorder())
 
 }
 
@@ -171,7 +170,7 @@ func listContainers() ([]ContainerInfo, error) {
 	}
 	defer cli.Close()
 
-	filters := filters.NewArgs(filters.Arg("label", "createdBy=devcraft"))
+	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevControl"))
 	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: true, Filters: filters})
 	if err != nil {
 		return nil, err
@@ -183,7 +182,7 @@ func listContainers() ([]ContainerInfo, error) {
 			url = fmt.Sprintf("http://%s:%d", container.Ports[0].IP, container.Ports[0].PublicPort)
 		}
 		if url == "" {
-			url = "Not Available"			
+			url = "Not Available"
 		}
 		containerlist = append(containerlist, ContainerInfo{
 			ID:     container.ID[:10],

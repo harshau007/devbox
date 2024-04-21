@@ -111,7 +111,7 @@ to quickly create a Cobra application.`,
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		
+
 			if m, ok := m.(modelContainer); ok && m.choice != "" {
 				nameFlag = strings.ToLower(m.choice)
 			}
@@ -138,7 +138,7 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(stopCmd)
-	stopCmd.PersistentFlags().StringP("name", "n", "","Name of the container")
+	stopCmd.PersistentFlags().StringP("name", "n", "", "Name of the container")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -180,7 +180,7 @@ func containerNames() ([]containerDetail, error) {
 	}
 	defer cli.Close()
 
-	filters := filters.NewArgs(filters.Arg("label", "createdBy=devcraft"))
+	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevControl"))
 	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{Filters: filters})
 	if err != nil {
 		return nil, err
@@ -188,7 +188,7 @@ func containerNames() ([]containerDetail, error) {
 
 	for _, container := range containers {
 		containerlist = append(containerlist, containerDetail{
-			Name:   container.Names[0][1:],
+			Name: container.Names[0][1:],
 		})
 	}
 

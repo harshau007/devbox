@@ -1,4 +1,4 @@
-module github.com/harshau007/devc
+module github.com/harshau007/DevControl
 
 go 1.22.2
 
