@@ -37,7 +37,7 @@ cd DevControl
 3. Build the project:
 
 ```bash
-go build
+go build -o devctl
 ```
 
 4. Move the binarys to a directory included in your system's `PATH` (optional, but recommended for easier access).
