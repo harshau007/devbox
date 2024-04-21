@@ -1,0 +1,30 @@
+# Maintainer: Your Name <your@email.com>
+pkgname=DevControl
+pkgver=0.1
+pkgrel=1
+destname="/usr/local/share/${pkgname}"
+pkgdesc="Description of your application"
+arch=('x86_64')
+url="https://github.com/harshau007/devcraft"
+license=('GPL3')
+depends=('go>=1.22.0' 'docker')
+source=("$pkgname".tar.gz::"${url}"/releases/download/latest/"${pkgname}-${pkgver}".tar.gz)
+sha256sums=('7bdad050d7c5f7bc090f96aec689f9eb9a761bd423a9f34b76c575406301bac6')
+
+build() {
+  cd ${pkgname}
+  export GOPATH="${srcdir}"
+  go build -o devctl
+}
+
+package() {
+  install -dm755 ${pkgdir}${destname}/
+  cp -r ${srcdir}/${pkgname}/dockerfile ${pkgdir}${destname}/
+  cp -r ${srcdir}/${pkgname}/settings.json ${pkgdir}${destname}/
+
+  
+  cd ${pkgname}
+  install -Dm755 port "${pkgdir}/usr/bin/port"
+  install -Dm755 start "${pkgdir}/usr/bin/start"
+  install -Dm755 devctl "${pkgdir}/usr/bin/devctl"
+}
