@@ -1,5 +1,7 @@
-
 {
     "workbench.colorTheme": "Default Dark Modern",
-    "editor.wordWrap": "on"
+    "editor.wordWrap": "on",
+    "files.autoSave": "afterDelay",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.inlineSuggest.suppressSuggestions": true
 }
