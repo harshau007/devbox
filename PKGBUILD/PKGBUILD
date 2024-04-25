@@ -1,6 +1,6 @@
 # Maintainer: Your Name <your@email.com>
 pkgname=DevControl
-pkgver=0.1
+pkgver=0.2
 pkgrel=1
 destname="/usr/local/share/${pkgname}"
 pkgdesc="Description of your application"
@@ -9,7 +9,7 @@ url="https://github.com/harshau007/devcraft"
 license=('GPL3')
 depends=('go>=1.22.0' 'docker')
 source=("$pkgname".tar.gz::"${url}"/releases/download/latest/"${pkgname}-${pkgver}".tar.gz)
-sha256sums=('7bdad050d7c5f7bc090f96aec689f9eb9a761bd423a9f34b76c575406301bac6')
+sha256sums=('8eeca3565914c459c523b3ba74c31db23e981933dbad6e1994ca5133a688895e')
 
 build() {
   cd ${pkgname}
