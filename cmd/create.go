@@ -8,11 +8,10 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"sync"
+	"time"
 
-	"github.com/charmbracelet/bubbles/spinner"
+	newspinner "github.com/briandowns/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
 
@@ -79,58 +78,6 @@ func (m model) View() string {
 	return s.String()
 }
 
-type loaderModel struct {
-    spinner  spinner.Model
-    quitting bool
-    err      error
-    id       string
-    done     bool
-    mutex    sync.Mutex
-}
-
-func initialModel() loaderModel {
-    s := spinner.New()
-    s.Spinner = spinner.Dot
-    s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#ffffff"))
-    return loaderModel{spinner: s}
-}
-
-func (m *loaderModel) Init() tea.Cmd {
-    return m.spinner.Tick
-}
-
-func (m *loaderModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-    switch msg := msg.(type) {
-    case tea.KeyMsg:
-        switch msg.String() {
-        case "ctrl+c", "q":
-            m.quitting = true
-            return m, tea.Quit
-        default:
-            return m, nil
-        }
-
-    case spinner.TickMsg:
-        var cmd tea.Cmd
-        m.spinner, cmd = m.spinner.Update(msg)
-        return m, cmd
-
-    default:
-        return m, nil
-    }
-}
-
-func (m *loaderModel) View() string {
-    if m.err != nil {
-        return m.err.Error()
-    }
-    str := fmt.Sprintf("\n  %s Creating Code Instance... \n\n", m.spinner.View())
-    if m.id != "" {
-        str += fmt.Sprintf("Container created with ID: %s\n", m.id)
-    }
-    return str
-}
-
 var createcmd = &cobra.Command{
 	Use:   "create",
 	Short: "A brief description of your application",
@@ -184,49 +131,36 @@ to quickly create a Cobra application.`,
 }
 
 func createCodeInstance(container CreateContainer) (string, error) {
-    m := initialModel()
-    p := tea.NewProgram(&m)
-    var wg sync.WaitGroup
-    wg.Add(1)
-    done := make(chan struct{})
+    errCh := make(chan error)
+    containerCh := make(chan string)
 
     go func() {
-        defer wg.Done()
         cmd := exec.Command("port", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath))
         output, err := cmd.CombinedOutput()
         if err != nil {
-            m.mutex.Lock()
-            m.err = fmt.Errorf("error executing the script: %v", err)
-            m.mutex.Unlock()
-            close(done)
+            errCh <- fmt.Errorf("error executing the script: %v", err)
             return
         }
 
         outputLines := strings.Split(strings.TrimSpace(string(output)), "\n")
         containerId := outputLines[len(outputLines)-1]
 
-        m.mutex.Lock()
-        m.id = containerId[:10]
-        m.done = true
-        m.mutex.Unlock()
-        close(done)
+        containerCh <- containerId[:10]
     }()
 
-    go func() {
-        for {
-            select {
-            case <-done:
-                p.Kill()
-                return
-            default:
-                _, err := p.Run()
-                if err != nil {
-                    return
-                }
-            }
-        }
-    }()
+	fmt.Print("\n\t")
+    s := newspinner.New(newspinner.CharSets[9], 100*time.Millisecond)
+    s.Writer = os.Stderr
+    s.Suffix = " Creating Code Instance...\n"
+    s.Start()
+    defer s.Stop()
 
-    wg.Wait()
-    return m.id, m.err
+    select {
+    case err := <-errCh:
+        s.Stop()
+        return "", err
+    case containerId := <-containerCh:
+        s.Stop()
+        return containerId, nil
+    }
 }
