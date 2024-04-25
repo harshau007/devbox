@@ -9,7 +9,7 @@ url="https://github.com/harshau007/devcraft"
 license=('GPL3')
 depends=('go>=1.22.0' 'docker')
 source=("$pkgname".tar.gz::"${url}"/releases/download/latest/"${pkgname}-${pkgver}".tar.gz)
-sha256sums=('8eeca3565914c459c523b3ba74c31db23e981933dbad6e1994ca5133a688895e')
+sha256sums=('61254da8d8992ff3749746438c5d8b51ff0231c6f65feb58ca5176daab7389d0')
 
 build() {
   cd ${pkgname}
