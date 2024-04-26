@@ -21,7 +21,7 @@ type CreateContainer struct {
     FolderPath string
 }
 
-var choices = []string{"NodeLTS", "Node18", "Node20", "Python", "Rust"}
+var choices = []string{"NodeLTS", "Node18", "Node20", "Python", "Rust", "Go", "Java8", "Java11", "Java17", "Java20", "Java21"}
 
 type model struct {
 	cursor int

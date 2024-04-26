@@ -3,5 +3,5 @@
     "editor.wordWrap": "on",
     "files.autoSave": "afterDelay",
     "editor.cursorSmoothCaretAnimation": "on",
-    "editor.inlineSuggest.suppressSuggestions": true
+    "workbench.startupEditor": "none"
 }

@@ -1,6 +1,7 @@
 FROM ubuntu:20.04
 
 LABEL maintainer="https://github.com/harshau007"
+
 LABEL createdBy="DevControl"
 
 RUN apt-get update && apt-get install -y curl ca-certificates software-properties-common
@@ -8,28 +9,38 @@ RUN apt-get update && apt-get install -y curl ca-certificates software-propertie
 ARG ADDITIONAL_PACKAGES
 
 RUN if [ -n "$ADDITIONAL_PACKAGES" ]; then \
-        case "$ADDITIONAL_PACKAGES" in \
-            "nodelts") \
-                curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
-                apt-get install -y nodejs ;; \
-            "node21") \
-                curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && \
-                apt-get install -y nodejs ;; \
-            "node18") \
-                curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-                apt-get install -y nodejs ;; \
-            "python") \
-                apt-get install -y python3 python3-pip ;; \
-            "rust") \
-                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y ;; \
-            "go") \
-                add-apt-repository ppa:longsleep/golang-backports && \
-                apt-get update && \
-                apt-get install -y golang-go ;; \
-            *) \
-                apt-get install -y $ADDITIONAL_PACKAGES ;; \
-        esac; \
-    fi
+    case "$ADDITIONAL_PACKAGES" in \
+    "nodelts") \
+        curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+        apt-get install -y nodejs ;; \
+    "node21") \
+        curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && \
+        apt-get install -y nodejs ;; \
+    "node18") \
+        curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+        apt-get install -y nodejs ;; \
+    "python") \
+        apt-get install -y python3 python3-pip ;; \
+    "rust") \
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y ;; \
+    "go") \
+        add-apt-repository ppa:longsleep/golang-backports && \
+        apt-get update && \
+        apt-get install -y golang-go ;; \
+    "java8") \
+        apt-get install -y openjdk-8-jdk ;; \
+    "java11") \
+        apt-get install -y openjdk-11-jdk ;; \
+    "java17") \
+        apt-get install -y openjdk-17-jdk ;; \
+    "java20") \
+        apt-get install -y openjdk-20-jdk ;; \
+    "java21") \
+        apt-get install -y openjdk-21-jdk ;; \
+    *) \
+        apt-get install -y $ADDITIONAL_PACKAGES ;; \
+    esac; \
+fi
 
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
