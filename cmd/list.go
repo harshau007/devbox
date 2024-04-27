@@ -83,7 +83,7 @@ func listContainers() error {
     }
     fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 
-    fmt.Printf("%-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+    fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
         containerIDWidth, "CONTAINER ID",
         imageWidth, "IMAGE",
         volumeWidth, "VOLUME",
@@ -109,7 +109,7 @@ func listContainers() error {
         urls := url
         names := truncateString(container.Names[0][1:], namesWidth)
 
-        fmt.Printf("%-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+        fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
             containerIDWidth, containerID,
             imageWidth, image,
             volumeWidth, volume,
@@ -118,9 +118,8 @@ func listContainers() error {
             portsWidth, urls,
             namesWidth, names,
         )
+        fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
     }
-
-    fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 
     return nil
 }
@@ -135,7 +134,6 @@ func listAllContainers() error {
 
 	filters := filters.NewArgs(
 		filters.Arg("label", "createdBy=DevControl"),
-		filters.Arg("status", "exited"),
 	)
     containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: true, Filters: filters})
     if err != nil {
@@ -160,7 +158,7 @@ func listAllContainers() error {
 
     fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 
-    fmt.Printf("\t%-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+    fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
         containerIDWidth, "CONTAINER ID",
         imageWidth, "IMAGE",
         volumeWidth, "VOLUME",
@@ -186,7 +184,7 @@ func listAllContainers() error {
         urls := url
         names := truncateString(container.Names[0][1:], namesWidth)
 
-        fmt.Printf("\t%-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+        fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
             containerIDWidth, containerID,
             imageWidth, image,
             volumeWidth, volume,
