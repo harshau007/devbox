@@ -15,13 +15,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "devctl",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "DevControl is a powerful CLI tool to create and manage isolated containers for developers with their desired technology stacks, such as Node.js, Python, Rust, and more.",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -39,6 +33,7 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(createcmd)
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
+	rootCmd.Version = "0.3.0-beta"
 	createcmd.PersistentFlags().StringP("name", "n", "","Name of the container")
 	createcmd.PersistentFlags().StringP("package", "p", "","Name of the package")
 	createcmd.PersistentFlags().StringP("volume", "v", "","Path to the volume")

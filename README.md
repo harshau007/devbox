@@ -6,10 +6,12 @@ DevControl is a powerful command-line interface tool built in Go using Cobra, Do
 
 ## Features
 
-- **Create**: Create a new isolated container with your desired technology stack.
-- **List**: List all available containers and their status.
-- **Start**: Start an existing container.
-- **Stop**: Stop a running container.
+- **create**: Create a new isolated container with your desired technology stack.
+- **start**: Start an existing container.
+- **stop**: Stop a running container.
+- **ps**: List containers and their status.
+- **images**: List all images.
+- **rmi**: Remove images
 
 ## Prerequisites
 
@@ -60,14 +62,6 @@ Creates a new isolated container with the specified technology stack. Available 
 - `--version, -v` (string): Specify the version of the technology stack to use.
 - `--package, -p` (string): Specify the ports to expose for the container.
 
-### `list`
-
-```
-devctl list
-```
-
-Lists all available containers and their status.
-
 ### `start`
 
 ```
@@ -89,6 +83,31 @@ Stops the specified running container.
 #### Options
 
 - `--name, -n` (string): Specify a name for the container.
+### `ps`
+
+```
+devctl ps
+```
+
+Lists running containers and their status.
+
+- `--all, -a` : List all containers
+
+### `images`
+
+```
+devctl images
+```
+
+Lists all images.
+
+### `rmi`
+
+```
+devctl rmi [id]
+```
+
+Remove images.
 
 ## Contributing
 
@@ -103,4 +122,3 @@ DevControl is released under the [GNU General Public License](LICENSE).
 - [Cobra](https://github.com/spf13/cobra) for the CLI framework.
 - [Docker Engine API](https://docs.docker.com/engine/api/) for interacting with Docker.
 - [Bubbletea](https://github.com/charmbracelet/bubbletea) for the terminal user interface.
-- [Lipgloss](https://github.com/charmbracelet/lipgloss) for styling terminal output.

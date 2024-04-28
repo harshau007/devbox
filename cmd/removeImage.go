@@ -1,5 +1,5 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+Copyright © 2024 Harsh Upadhyay amanupadhyay2004@gmail.com
 */
 package cmd
 
@@ -13,25 +13,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var force bool
+
 // removeImageCmd represents the removeImage command
 var removeImageCmd = &cobra.Command{
 	Use:   "rmi",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Remove images",
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		removeImages(args)
+		if force {
+			removeImagesForce(args)
+		} else {
+			removeImages(args)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(removeImageCmd)
-
+	removeImageCmd.Flags().BoolVarP(&force, "force", "f", false, "Force removal of the image")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -52,10 +52,37 @@ func removeImages(ids []string) {
 
 
 	for _, id := range ids {	
-		images, err := cli.ImageRemove(ctx, id, imagetype.RemoveOptions{Force: true, PruneChildren: true})
+		images, err := cli.ImageRemove(ctx, id, imagetype.RemoveOptions{Force: false, PruneChildren: true})
 		if err != nil {
 			fmt.Println("Image must be forced to remove")
+			continue
 		}
-		fmt.Println("Deleted: " + images[1].Deleted[7:])
+		if len(images[1].Deleted) > 0 {
+			fmt.Println("Deleted: " + images[1].Deleted[7:])
+		} else {
+			fmt.Println("No images were deleted")
+		}
+	}
+}
+
+func removeImagesForce(ids []string) {
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		fmt.Println("Error connecting to Docker")
+	}
+
+
+	for _, id := range ids {	
+		images, err := cli.ImageRemove(ctx, id, imagetype.RemoveOptions{Force: true, PruneChildren: true})
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if len(images[1].Deleted) > 0 {
+			fmt.Println("Deleted: " + images[1].Deleted[7:])
+		} else {
+			fmt.Println("No images were deleted")
+		}
 	}
 }

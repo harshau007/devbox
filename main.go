@@ -1,6 +1,5 @@
 /*
-Copyright © 2024 NAME HERE amanupadhyay2004@gmail.com
-
+Copyright © 2024 Harsh Upadhyay amanupadhyay2004@gmail.com
 */
 package main
 
