@@ -6,12 +6,12 @@ DevControl is a powerful command-line interface tool built in Go using Cobra, Do
 
 ## Features
 
-- **create**: Create a new isolated container with your desired technology stack.
-- **start**: Start an existing container.
-- **stop**: Stop a running container.
-- **ps**: List containers and their status.
-- **images**: List all images.
-- **rmi**: Remove images
+- **`create`** : Create a new isolated container with your desired technology stack.
+- **`start`** : Start an existing container.
+- **`stop`** : Stop a running container.
+- **`ps`** : List containers and their status.
+- **`images`** : List all images.
+- **`rmi`** : Remove images.
 
 ## Prerequisites
 
@@ -42,8 +42,14 @@ cd DevControl
 go build -o devctl
 ```
 
-4. Move the binarys to a directory included in your system's `PATH` (optional, but recommended for easier access).
+4. Move the binarys to `/usr/bin/` (including port & start) also move dockerfile & settings.json to `/usr/local/share/DevControl/`
 
+### &emsp; `OR`
+Install via `makepkg` (Current supports: Arch Linux):
+- Run inside PKGBUILD/
+```bash
+makepkg -si 
+```
 ## Usage
 
 After installing DevControl, you can use the following commands:
