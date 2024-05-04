@@ -59,8 +59,8 @@ Creates a new isolated container with the specified technology stack. Available 
 #### Options
 
 - `--name, -n` (string): Specify a name for the container.
-- `--version, -v` (string): Specify the version of the technology stack to use.
-- `--package, -p` (string): Specify the ports to expose for the container.
+- `--volume, -v` (string): Specify the volume to mount.
+- `--package, -p` (string): Specify the technology to use.
 
 ### `start`
 
