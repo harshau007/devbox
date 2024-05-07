@@ -10,6 +10,7 @@ DevControl is a powerful command-line interface tool built in Go using Cobra, Do
 - **`start`** : Start an existing container.
 - **`stop`** : Stop a running container.
 - **`ps`** : List containers and their status.
+- **`rm`** : Remove container.
 - **`images`** : List all images.
 - **`rmi`** : Remove images.
 
@@ -99,6 +100,16 @@ Lists running containers and their status.
 
 - `--all, -a` : List all containers
 
+
+### `rm`
+
+```
+devctl rm [id]
+```
+
+Remove images.
+- `--force, -f` : Force remove containers.
+
 ### `images`
 
 ```
@@ -114,6 +125,7 @@ devctl rmi [id]
 ```
 
 Remove images.
+- `--force, -f` : Force remove images.
 
 ## Contributing
 
