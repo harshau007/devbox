@@ -83,7 +83,7 @@ func init() {
 }
 
 func startContainer(name string) (string, error) {
-	cmd := exec.Command("start", name)
+	cmd := exec.Command("startdevctl", name)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("Error executing the script: %v\n", err)

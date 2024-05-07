@@ -23,15 +23,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Building DevControl Tar file
+      - name: Building devcontrol Tar file
         run: |
           cd ..
-          touch DevControl-${{ inputs.tag }}.tar.gz
-          tar -czf DevControl-${{ inputs.tag }}.tar.gz DevControl/
+          touch devcontrol-${{ inputs.tag }}.tar.gz
+          tar -czf devcontrol-${{ inputs.tag }}.tar.gz devcontrol/
           touch checksum
-          sha256sum DevControl-${{ inputs.tag }}.tar.gz > checksum
-          mv checksum DevControl/
-          mv DevControl-${{ inputs.tag }}.tar.gz DevControl/
+          sha256sum devcontrol-${{ inputs.tag }}.tar.gz > checksum
+          mv checksum devcontrol/
+          mv devcontrol-${{ inputs.tag }}.tar.gz devcontrol/
 
       - name: Checking if release with date tag exist
         run: |
@@ -62,7 +62,7 @@ jobs:
           gh release delete latest
       - name: Release Tar File
         run: |
-          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "DevControl"
+          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "devcontrol"
       - name: Release Tar File with latest
         run: |
-          gh release create latest *tar.gz checksum --latest --title "DevControl"
+          gh release create latest *tar.gz checksum --latest --title "devcontrol"

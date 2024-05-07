@@ -124,12 +124,18 @@ var createcmd = &cobra.Command{
 	},
 }
 
+func init() {
+	createcmd.PersistentFlags().StringP("name", "n", "","Name of the container")
+	createcmd.PersistentFlags().StringP("package", "p", "","Name of the package")
+	createcmd.PersistentFlags().StringP("volume", "v", "","Path to the volume")
+}
+
 func createCodeInstance(container CreateContainer) (string, error) {
     errCh := make(chan error)
     containerCh := make(chan string)
 
     go func() {
-        cmd := exec.Command("port", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath))
+        cmd := exec.Command("portdevctl", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath))
         output, err := cmd.CombinedOutput()
         if err != nil {
             errCh <- fmt.Errorf("error executing the script: %v", err)

@@ -1,5 +1,5 @@
 # Maintainer: Your Name <your@email.com>
-pkgname=DevControl
+pkgname=devcontrol
 pkgver=0.4
 pkgrel=1
 destname="/usr/local/share/${pkgname}"

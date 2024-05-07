@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	// "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	imagetype "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
