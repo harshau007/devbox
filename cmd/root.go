@@ -15,7 +15,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "devctl",
-	Short: "DevControl is a powerful CLI tool to create and manage isolated containers\nfor developers with their desired technology stacks, such as Node.js, Python, Rust, and more.",
+	Short: "DevControl is a powerful CLI tool to create and manage isolated containers for developers with their desired technology stacks, such as Node.js, Python, Rust, and more.",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

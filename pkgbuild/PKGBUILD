@@ -1,15 +1,15 @@
-# Maintainer: Your Name <your@email.com>
+# Maintainer: Harsh Upadhyay amanupadhyay2004@gmail.com
 pkgname=devcontrol
 pkgver=0.5
 pkgrel=1
 destname="/usr/local/share/${pkgname}"
-pkgdesc="Description of your application"
+pkgdesc="DevControl is a powerful CLI tool to create and manage isolated containers for developers with their desired technology stacks, such as Node.js, Python, Rust, and more."
 arch=('x86_64')
 url="https://github.com/harshau007/devcontrol"
 license=('GPL3')
 depends=('go>=1.22.0' 'docker')
 source=("$pkgname".tar.gz::"${url}"/releases/download/latest/"${pkgname}-${pkgver}".tar.gz)
-sha256sums=('43e404967a07d7da2abde452b9a34202d790878882f02ea7362a8fbfa74a2492')
+sha256sums=('fbbafadda253c0a3e234e3052a41bf1a56998eedc0a4149ff7b0e8bf83cfcafd')
 
 build() {
   cd ${pkgname}
