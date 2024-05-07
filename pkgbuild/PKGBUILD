@@ -1,15 +1,15 @@
 # Maintainer: Your Name <your@email.com>
 pkgname=devcontrol
-pkgver=0.4
+pkgver=0.5
 pkgrel=1
 destname="/usr/local/share/${pkgname}"
 pkgdesc="Description of your application"
 arch=('x86_64')
-url="https://github.com/harshau007/devcraft"
+url="https://github.com/harshau007/devcontrol"
 license=('GPL3')
 depends=('go>=1.22.0' 'docker')
 source=("$pkgname".tar.gz::"${url}"/releases/download/latest/"${pkgname}-${pkgver}".tar.gz)
-sha256sums=('ba2befc4eaed6132104e38f99900717ec8b2f17f56aa1811a8e7f4714aee1107')
+sha256sums=('43e404967a07d7da2abde452b9a34202d790878882f02ea7362a8fbfa74a2492')
 
 build() {
   cd ${pkgname}
@@ -24,7 +24,7 @@ package() {
 
   
   cd ${pkgname}
-  install -Dm755 port "${pkgdir}/usr/bin/port"
-  install -Dm755 start "${pkgdir}/usr/bin/start"
+  install -Dm755 portdevctl "${pkgdir}/usr/bin/portdevctl"
+  install -Dm755 startdevctl "${pkgdir}/usr/bin/startdevctl"
   install -Dm755 devctl "${pkgdir}/usr/bin/devctl"
 }

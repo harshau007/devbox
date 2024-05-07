@@ -62,7 +62,7 @@ jobs:
           gh release delete latest
       - name: Release Tar File
         run: |
-          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "devcontrol"
+          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "DevControl"
       - name: Release Tar File with latest
         run: |
-          gh release create latest *tar.gz checksum --latest --title "devcontrol"
+          gh release create latest *tar.gz checksum --latest --title "DevControl"
