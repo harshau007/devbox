@@ -29,7 +29,7 @@ type model struct {
 	choice string
 }
 
-var tempPath = "Desktop"
+var Dir = "Desktop"
 
 func (m model) Init() tea.Cmd {
 	return nil
@@ -103,15 +103,16 @@ var createcmd = &cobra.Command{
 					fmt.Println(err)
 					os.Exit(1)
 				}
-				fmt.Println("Cloning repository " + name + " to " + os.Getenv("HOME") + tempPath + "/" + name)
+				fmt.Println("Cloning repository " + name + " to " + os.Getenv("HOME") + "/" + Dir + "/" + name)
 
-				err = os.MkdirAll(os.Getenv("HOME")+ "/" + tempPath + "/" + name, 0755)
+				err = os.MkdirAll(os.Getenv("HOME")+ "/" + Dir + "/" + name, 0755)
+
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
 				}
 
-				cmd := exec.Command("git", "clone", urlFlag, os.Getenv("HOME")+ "/" + tempPath + "/" + name)  
+				cmd := exec.Command("git", "clone", urlFlag, os.Getenv("HOME")+ "/" + Dir + "/" + name)  
 				_, err = cmd.CombinedOutput()
 
 				if err != nil {
@@ -119,7 +120,7 @@ var createcmd = &cobra.Command{
 					os.Exit(1)
 				}
 
-				volFlag = tempPath + "/" + name
+				volFlag = Dir + "/" + name
 			} else {
 				fmt.Print("Enter folder path: $HOME/")
 				fmt.Scanln(&volFlag)
@@ -154,6 +155,7 @@ var createcmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.AddCommand(createcmd)
 	createcmd.PersistentFlags().StringP("name", "n", "","Name of the container")
 	createcmd.PersistentFlags().StringP("package", "p", "","Name of the package")
 	createcmd.PersistentFlags().StringP("volume", "v", "","Path to the volume")

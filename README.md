@@ -47,7 +47,7 @@ go build -o devctl
 
 ### &emsp; `OR`
 Install via `makepkg` (Current supports: Arch Linux):
-- Run inside PKGBUILD/
+- Run inside pkgbuild/
 ```bash
 makepkg -si 
 ```
@@ -69,6 +69,8 @@ Creates a new isolated container with the specified technology stack. Available 
 - `--volume, -v` (string): Specify the volume to mount.
 - `--package, -p` (string): Specify the technology to use.
 - `--url, -u` (string): Specify the URL to clone the repository.
+
+> **Note:** If you specify the `--url` option, DevControl will clone the repository and use the cloned repository as the volume. Default directory is `Desktop`
 
 ### `start`
 
