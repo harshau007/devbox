@@ -58,7 +58,7 @@ After installing DevControl, you can use the following commands:
 ### `create`
 
 ```
-devctl create [options]
+devctl create [OPTIONS]
 ```
 
 Creates a new isolated container with the specified technology stack. Available technologies include `nodejs`, `python`, `rust`, and more.
@@ -68,11 +68,12 @@ Creates a new isolated container with the specified technology stack. Available 
 - `--name, -n` (string): Specify a name for the container.
 - `--volume, -v` (string): Specify the volume to mount.
 - `--package, -p` (string): Specify the technology to use.
+- `--url, -u` (string): Specify the URL to clone the repository.
 
 ### `start`
 
 ```
-devctl start [options]
+devctl start [OPTIONS]
 ```
 
 Starts the specified container.
@@ -83,7 +84,7 @@ Starts the specified container.
 ### `stop`
 
 ```
-devctl stop [options]
+devctl stop [OPTIONS]
 ```
 
 Stops the specified running container.
@@ -93,7 +94,7 @@ Stops the specified running container.
 ### `ps`
 
 ```
-devctl ps
+devctl ps [OPTIONS]
 ```
 
 Lists running containers and their status.
@@ -104,7 +105,7 @@ Lists running containers and their status.
 ### `rm`
 
 ```
-devctl rm [id]
+devctl rm [OPTIONS] CONTAINER [CONTAINER...]
 ```
 
 Remove images.
@@ -121,7 +122,7 @@ Lists all images.
 ### `rmi`
 
 ```
-devctl rmi [id]
+devctl rmi [OPTIONS] IMAGE [IMAGE...]
 ```
 
 Remove images.

@@ -33,8 +33,8 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(createcmd)
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
-	rootCmd.Version = "0.3.0-beta"
-	rootCmd.SetVersionTemplate("{{.Version}}\n")
+	rootCmd.Version = "1.0.0"
+	rootCmd.SetVersionTemplate("DevControl version {{.Version}}\n")
 }
 
 

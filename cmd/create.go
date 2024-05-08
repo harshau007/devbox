@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -27,6 +28,8 @@ type model struct {
 	cursor int
 	choice string
 }
+
+var tempPath = "Desktop"
 
 func (m model) Init() tea.Cmd {
 	return nil
@@ -81,11 +84,11 @@ func (m model) View() string {
 var createcmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create code instance",
-
 	Run: func(cmd *cobra.Command, args []string) {
 		nameFlag, _ := cmd.Flags().GetString("name")
 		pkgFlag, _ := cmd.Flags().GetString("package")
 		volFlag, _ := cmd.Flags().GetString("volume")
+		urlFlag, _ := cmd.Flags().GetString("url")
 
 		if nameFlag == "" {
 			fmt.Print("Enter the name of the container: ")
@@ -93,8 +96,34 @@ var createcmd = &cobra.Command{
 		}
 
 		if volFlag == "" {
-			fmt.Print("Enter folder path: $HOME/")
-			fmt.Scanln(&volFlag)
+			if urlFlag != "" {
+				name, err := getRepoName(urlFlag)
+
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+				fmt.Println("Cloning repository " + name + " to " + os.Getenv("HOME") + tempPath + "/" + name)
+
+				err = os.MkdirAll(os.Getenv("HOME")+ "/" + tempPath + "/" + name, 0755)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+
+				cmd := exec.Command("git", "clone", urlFlag, os.Getenv("HOME")+ "/" + tempPath + "/" + name)  
+				_, err = cmd.CombinedOutput()
+
+				if err != nil {
+					fmt.Printf("error executing the script: %v", err)
+					os.Exit(1)
+				}
+
+				volFlag = tempPath + "/" + name
+			} else {
+				fmt.Print("Enter folder path: $HOME/")
+				fmt.Scanln(&volFlag)
+			}
 		}
 
 		if pkgFlag == "" {
@@ -128,6 +157,7 @@ func init() {
 	createcmd.PersistentFlags().StringP("name", "n", "","Name of the container")
 	createcmd.PersistentFlags().StringP("package", "p", "","Name of the package")
 	createcmd.PersistentFlags().StringP("volume", "v", "","Path to the volume")
+	createcmd.PersistentFlags().StringP("url", "u", "","URL to the repository")
 }
 
 func createCodeInstance(container CreateContainer) (string, error) {
@@ -162,5 +192,33 @@ func createCodeInstance(container CreateContainer) (string, error) {
     case containerId := <-containerCh:
         s.Stop()
         return containerId, nil
+    }
+}
+
+func getRepoName(repoURL string) (string, error) {
+    u, err := url.Parse(repoURL)
+    if err != nil {
+        return "", err
+    }
+
+    host := u.Hostname()
+    if !strings.HasSuffix(host, "github.com") && !strings.HasSuffix(host, "gitlab.com") {
+        return "", fmt.Errorf("invalid repository URL: %s", repoURL)
+    }
+
+    if !strings.HasPrefix(u.Path, "/") {
+        return "", fmt.Errorf("invalid repository URL: %s", repoURL)
+    }
+
+    pathComponents := strings.Split(u.Path, "/")
+
+    if len(pathComponents) < 3 {
+        return "", fmt.Errorf("invalid repository URL: %s", repoURL)
+    }
+
+    if strings.HasSuffix(host, "github.com") {
+        return pathComponents[2], nil
+    } else {
+        return pathComponents[3], nil
     }
 }
