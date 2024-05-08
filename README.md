@@ -43,7 +43,7 @@ cd DevControl
 go build -o devctl
 ```
 
-4. Move the binarys to `/usr/bin/` (including port & start) also move dockerfile & settings.json to `/usr/local/share/DevControl/`
+4. Move the binarys to `/usr/bin/` (including port & start) also move dockerfile & settings.json to `/usr/local/share/devcontrol/`
 
 ### &emsp; `OR`
 Install via `makepkg` (Current supports: Arch Linux):
