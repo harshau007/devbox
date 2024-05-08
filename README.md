@@ -54,7 +54,7 @@ makepkg -si
 ## Usage
 
 After installing DevControl, you can use the following commands:
-
+> **TIP:** Initial images creation may take some time depending on your internet speed.
 ### `create`
 
 ```
