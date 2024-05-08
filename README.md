@@ -28,7 +28,7 @@ You can install DevControl by following these steps:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/harshau007/DevControl.git
+git clone https://github.com/harshau007/devcontrol.git
 ```
 
 2. Navigate to the project directory:
@@ -43,7 +43,18 @@ cd devcontrol
 go build -o devctl
 ```
 
-4. Move the binarys to `/usr/bin/` (including port & start) also move dockerfile & settings.json to `/usr/local/share/devcontrol/`
+4. Move the binarys to `/usr/bin/` (including portdevctl & startdevctl) 
+```bash
+sudo cp devctl portdevctl startdevctl /usr/bin/
+```
+5. Create devcontrol directory in `/usr/local/share/`
+```bash
+sudo mkdir /usr/local/share/devcontrol/
+```
+6. Move dockerfile & settings.json to `/usr/local/share/devcontrol/`
+```bash
+sudo cp dockerfile settings.json /usr/local/share/devcontrol/
+```
 
 ### &emsp; `OR`
 Install via `makepkg` (Current supports: Arch Linux):
