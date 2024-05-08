@@ -34,7 +34,7 @@ git clone https://github.com/harshau007/DevControl.git
 2. Navigate to the project directory:
 
 ```bash
-cd DevControl
+cd devcontrol
 ```
 
 3. Build the project:
