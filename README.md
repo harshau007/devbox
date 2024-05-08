@@ -2,7 +2,7 @@
 
 # DevControl
 
-DevControl is a powerful command-line interface tool built in Go using Cobra, Docker Engine API, Bubbletea, and Lipgloss. It allows users to create and manage isolated containers with their desired technology stacks, such as Node.js, Python, Rust, and more.
+DevControl is a powerful command-line interface tool built in Go using Cobra, Docker Engine API, and Bubbletea. It allows users to create and manage isolated containers with their desired technology stacks, such as Node.js, Python, Rust, and more.
 
 ## Features
 
