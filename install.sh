@@ -120,8 +120,8 @@ uninstall_project() {
 
 # Check if the project is already installed
 if command -v devctl >/dev/null 2>&1; then
-    read -p "$(echo -e "${YELLOW}The project is already installed. Do you want to uninstall it? (y/n) ${NC}")" -n 1 -r
-    echo
+    echo -e "${YELLOW}The project is already installed.${NC}"
+    read -p "$(echo -e "${YELLOW}Do you want to uninstall it? (y/n) ${NC}")" -r
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         uninstall_project
     else
