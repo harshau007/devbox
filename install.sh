@@ -106,33 +106,9 @@ remove_repo() {
     rm -rf "$REPO_DIR"
 }
 
-# Function to uninstall the project
-uninstall_project() {
-    echo -e "\n${YELLOW}Uninstalling the project...${NC}"
-    sudo rm -f /usr/bin/devctl /usr/bin/portdevctl /usr/bin/startdevctl || {
-        echo -e "${RED}Failed to remove binaries.${NC}"
-    }
-    sudo rm -rf /usr/local/share/devcontrol/ || {
-        echo -e "${RED}Failed to remove config files.${NC}"
-    }
-    echo -e "\n${GREEN}Project uninstallation completed!${NC}"
-}
+# Function to handle script exit
+trap remove_repo EXIT
 
-# Check if the project is already installed
-if command -v devctl >/dev/null 2>&1; then
-    echo -e "${YELLOW}The project is already installed.${NC}"
-    read -p "$(echo -e "${YELLOW}Do you want to uninstall it? (y/n) ${NC}")" -r
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        uninstall_project
-    else
-        echo -e "${YELLOW}Aborting...${NC}"
-        exit 0
-    fi
-else
-    # Function to handle script exit
-    trap remove_repo EXIT
-
-    check_distro
-    check_installations
-    setup_repository
-fi
+check_distro
+check_installations
+setup_repository

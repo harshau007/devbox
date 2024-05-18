@@ -43,7 +43,7 @@ You can uninstall DevControl by following these step
 
 ### Linux and MacOS
 ```sh
-curl -fsSL https://raw.githubusercontent.com/harshau007/devcontrol/main/install.sh | sh
+sudo rm -rf /usr/bin/devctl /usr/bin/portdevctl /usr/bin/startdevctl /usr/local/share/devcontrol/
 ```
 
 ## Usage
