@@ -24,16 +24,28 @@ Before using DevControl, ensure that you have the following installed:
 ## Installation
 
 You can install DevControl by following these step
+
 ### Linux and MacOS
 ```sh
 curl -fsSL https://raw.githubusercontent.com/harshau007/devcontrol/main/install.sh | sh
 ```
+
 ### &emsp; `OR`
 Install via `makepkg`
 - Run inside `pkgbuild/`
 ```bash
 makepkg -si 
 ```
+
+## Uninstallation
+
+You can uninstall DevControl by following these step
+
+### Linux and MacOS
+```sh
+curl -fsSL https://raw.githubusercontent.com/harshau007/devcontrol/main/install.sh | sh
+```
+
 ## Usage
 
 After installing DevControl, you can use the following commands:
