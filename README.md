@@ -50,6 +50,9 @@ sudo rm -rf /usr/bin/devctl /usr/bin/portdevctl /usr/bin/startdevctl /usr/local/
 
 After installing DevControl, you can use the following commands:
 > **TIP:** Initial images creation may take some time depending on your internet speed.
+
+> **Demo video**:
+[![Watch the video](assets/devctl-h.png)](https://youtu.be/HBUJdv5mNqM?si=tfzS1vaJAhAlqzKA)
 ### `create`
 
 ```
