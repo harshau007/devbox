@@ -27,21 +27,6 @@ check_distro() {
 
 # Function to check Go and Docker installations
 check_installations() {
-    if ! command -v go >/dev/null 2>&1; then
-        echo -e "${RED}Go 1.22 is not installed.${NC}"
-        echo "Please install Go 1.22 from https://go.dev/dl/"
-        INSTALL_GO=true
-    else
-        GO_VERSION=$(go version | awk '{print $3}')
-        if [[ "$GO_VERSION" != "go1.22"* ]]; then
-            echo -e "${RED}Go 1.22 is not installed.${NC}"
-            echo "Please install Go 1.22 from https://go.dev/dl/"
-            INSTALL_GO=true
-        else
-            echo -e "${GREEN}Go 1.22 is installed.${NC}"
-        fi
-    fi
-
     if ! command -v docker >/dev/null 2>&1; then
         echo -e "${RED}Docker is not installed.${NC}"
         echo "Please install Docker from https://docs.docker.com/get-docker/"

@@ -7,7 +7,7 @@ pkgdesc="DevControl is a powerful CLI tool to create and manage isolated contain
 arch=('x86_64')
 url="https://github.com/harshau007/devcontrol"
 license=('GPL3')
-depends=('go>=1.22.0' 'docker')
+depends=('docker')
 source=("$pkgname".tar.gz::"${url}"/releases/download/latest/"${pkgname}-${pkgver}".tar.gz)
 sha256sums=('e7f303a7ae5c29e6f925b855b57d535f945671212b0745ef02698776642fd58b')
 

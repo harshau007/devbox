@@ -18,7 +18,6 @@ DevControl is a powerful command-line interface tool built in Go using Cobra, Do
 
 Before using DevControl, ensure that you have the following installed:
 
-- Go (version 1.22 or later)
 - Docker
 
 ## Installation
