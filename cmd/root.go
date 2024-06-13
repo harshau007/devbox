@@ -1,6 +1,5 @@
 /*
 Copyright © 2024 NAME HERE amanupadhyay2004@gmail.com
-
 */
 package cmd
 
@@ -9,8 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -32,7 +29,5 @@ func Execute() {
 
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
-	rootCmd.Version = "1.0.0"
+	rootCmd.Version = "1.1.0"
 }
-
-
