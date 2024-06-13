@@ -47,47 +47,47 @@ func init() {
 }
 
 func listContainers() error {
-    ctx := context.Background()
-    cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-    if err != nil {
-        return err
-    }
-    defer cli.Close()
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
 
-    filters := filters.NewArgs(filters.Arg("label", "createdBy=DevControl"))
-    containers, err := cli.ContainerList(ctx, containertypes.ListOptions{Filters: filters})
-    if err != nil {
-        return err
-    }
+	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevControl"))
+	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{Filters: filters})
+	if err != nil {
+		return err
+	}
 
-    const (
-        containerIDWidth = 12
-        imageWidth       = 20
-        createdWidth     = 20
-        statusWidth      = 20
-        portsWidth       = 20
-        namesWidth       = 20
-    )
+	const (
+		containerIDWidth = 12
+		imageWidth       = 20
+		createdWidth     = 20
+		statusWidth      = 20
+		portsWidth       = 20
+		namesWidth       = 20
+	)
 
 	volumeWidth := maxVolumeWidth(containers)
 
 	if len(containers) == 0 {
-        fmt.Println("No containers found.")
-        return nil
-    }
-    fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+		fmt.Println("No containers found.")
+		return nil
+	}
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 
-    fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
-        containerIDWidth, "CONTAINER ID",
-        imageWidth, "IMAGE",
-        volumeWidth, "VOLUME",
-        createdWidth, "CREATED",
-        statusWidth, "STATUS",
-        portsWidth, "URL",
-        namesWidth, "NAMES")
-    fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+		containerIDWidth, "CONTAINER ID",
+		imageWidth, "IMAGE",
+		volumeWidth, "VOLUME",
+		createdWidth, "CREATED",
+		statusWidth, "STATUS",
+		portsWidth, "URL",
+		namesWidth, "NAMES")
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 
-    for _, container := range containers {
+	for _, container := range containers {
 		var url string
 		if len(container.Ports) > 0 {
 			url = fmt.Sprintf("http://%s:%d", container.Ports[0].IP, container.Ports[0].PublicPort)
@@ -95,74 +95,79 @@ func listContainers() error {
 		if url == "" {
 			url = "Not Available"
 		}
-        containerID := truncateString(container.ID, containerIDWidth)
-        image := truncateString(container.Image, imageWidth)
-        volume := truncateString(container.Mounts[0].Source, volumeWidth)
-        created := truncateString(time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"), createdWidth)
-        status := truncateString(container.Status, statusWidth)
-        urls := url
-        names := truncateString(container.Names[0][1:], namesWidth)
+		containerID := truncateString(container.ID, containerIDWidth)
+		image := truncateString(container.Image, imageWidth)
+		volume := "Not Available"
+		if len(container.Mounts) > 0 {
+			volume = truncateString(container.Mounts[0].Source, volumeWidth)
+		}
+		created := truncateString(time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"), createdWidth)
+		status := truncateString(container.Status, statusWidth)
+		names := "Not Available"
+		if len(container.Names) > 0 {
+			names = truncateString(container.Names[0][1:], namesWidth)
+		}
 
-        fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
-            containerIDWidth, containerID,
-            imageWidth, image,
-            volumeWidth, volume,
-            createdWidth, created,
-            statusWidth, status,
-            portsWidth, urls,
-            namesWidth, names,
-        )
-        fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
-    }
+		fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+			containerIDWidth, containerID,
+			imageWidth, image,
+			volumeWidth, volume,
+			createdWidth, created,
+			statusWidth, status,
+			portsWidth, url,
+			namesWidth, names,
+		)
+		fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	}
 
-    return nil
+	return nil
 }
 
 func listAllContainers() error {
-    ctx := context.Background()
-    cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-    if err != nil {
-        return err
-    }
-    defer cli.Close()
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
 
 	filters := filters.NewArgs(
 		filters.Arg("label", "createdBy=DevControl"),
 	)
-    containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: true, Filters: filters})
-    if err != nil {
-        return err
-    }
+	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: true, Filters: filters})
+	if err != nil {
+		return err
+	}
 
-    const (
-        containerIDWidth = 12
-        imageWidth       = 20
-        createdWidth     = 20
-        statusWidth      = 20
-        portsWidth       = 20
-        namesWidth       = 20
-    )
+	const (
+		containerIDWidth = 12
+		imageWidth       = 20
+		createdWidth     = 20
+		statusWidth      = 20
+		portsWidth       = 20
+		namesWidth       = 20
+	)
 
 	volumeWidth := maxVolumeWidth(containers)
 
 	if len(containers) == 0 {
-        fmt.Println("No containers found.")
-        return nil
-    }
+		fmt.Println("No containers found.")
+		return nil
+	}
 
-    fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 
-    fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
-        containerIDWidth, "CONTAINER ID",
-        imageWidth, "IMAGE",
-        volumeWidth, "VOLUME",
-        createdWidth, "CREATED",
-        statusWidth, "STATUS",
-        portsWidth, "URL",
-        namesWidth, "NAMES")
-    fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+		containerIDWidth, "CONTAINER ID",
+		imageWidth, "IMAGE",
+		volumeWidth, "VOLUME",
+		createdWidth, "CREATED",
+		statusWidth, "STATUS",
+		portsWidth, "URL",
+		namesWidth, "NAMES")
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 
-    for _, container := range containers {
+	for _, container := range containers {
 		var url string
 		if len(container.Ports) > 0 {
 			url = fmt.Sprintf("http://%s:%d", container.Ports[0].IP, container.Ports[0].PublicPort)
@@ -170,46 +175,51 @@ func listAllContainers() error {
 		if url == "" {
 			url = "Not Available"
 		}
-        containerID := truncateString(container.ID, containerIDWidth)
-        image := truncateString(container.Image, imageWidth)
-        volume := truncateString(container.Mounts[0].Source, volumeWidth)
-        created := truncateString(time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"), createdWidth)
-        status := truncateString(container.Status, statusWidth)
-        urls := url
-        names := truncateString(container.Names[0][1:], namesWidth)
+		containerID := truncateString(container.ID, containerIDWidth)
+		image := truncateString(container.Image, imageWidth)
+		volume := "Not Available"
+		if len(container.Mounts) > 0 {
+			volume = truncateString(container.Mounts[0].Source, volumeWidth)
+		}
+		created := truncateString(time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"), createdWidth)
+		status := truncateString(container.Status, statusWidth)
+		names := "Not Available"
+		if len(container.Names) > 0 {
+			names = truncateString(container.Names[0][1:], namesWidth)
+		}
 
-        fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
-            containerIDWidth, containerID,
-            imageWidth, image,
-            volumeWidth, volume,
-            createdWidth, created,
-            statusWidth, status,
-            portsWidth, urls,
-            namesWidth, names,
-        )
-    }
+		fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+			containerIDWidth, containerID,
+			imageWidth, image,
+			volumeWidth, volume,
+			createdWidth, created,
+			statusWidth, status,
+			portsWidth, url,
+			namesWidth, names,
+		)
+	}
 
-    fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 
-    return nil
+	return nil
 }
 
 func maxVolumeWidth(containers []types.Container) int {
-    maxWidth := 0
-    for _, container := range containers {
-        if len(container.Mounts) > 0 {
-            volumePath := container.Mounts[0].Source
-            if len(volumePath) > maxWidth {
-                maxWidth = len(volumePath)
-            }
-        }
-    }
-    return maxWidth
+	maxWidth := 0
+	for _, container := range containers {
+		if len(container.Mounts) > 0 {
+			volumePath := container.Mounts[0].Source
+			if len(volumePath) > maxWidth {
+				maxWidth = len(volumePath)
+			}
+		}
+	}
+	return maxWidth
 }
 
 func truncateString(str string, width int) string {
-    if len(str) > width {
-        return str[:width]
-    }
-    return str
+	if len(str) > width {
+		return str[:width]
+	}
+	return str
 }
