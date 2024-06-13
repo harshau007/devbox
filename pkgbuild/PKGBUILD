@@ -1,6 +1,6 @@
  # Maintainer: Harsh Upadhyay amanupadhyay2004@gmail.com
 pkgname=devcontrol
-pkgver=1.0.0
+pkgver=1.1.0
 pkgrel=1
 destname="/usr/local/share/${pkgname}"
 pkgdesc="DevControl is a powerful CLI tool to create and manage isolated containers for developers with their desired technology stacks, such as Node.js, Python, Rust, and more."
@@ -9,7 +9,7 @@ url="https://github.com/harshau007/devcontrol"
 license=('GPL3')
 depends=('docker')
 source=("$pkgname".tar.gz::"${url}"/releases/download/latest/"${pkgname}-${pkgver}".tar.gz)
-sha256sums=('e7f303a7ae5c29e6f925b855b57d535f945671212b0745ef02698776642fd58b')
+sha256sums=('ff480168b3634df3897ebaff4813d6475a14d17409b4226347365807d9807b86')
 
 build() {
   cd ${pkgname}
