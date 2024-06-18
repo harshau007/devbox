@@ -1,8 +1,8 @@
-![DevControl](assets/DevControl.png)
+<!-- ![DevControl](assets/DevControl.png) -->
 
-# DevControl
+# DevBox
 
-DevControl is a powerful command-line interface tool built in Go using Cobra, Docker Engine API, and Bubbletea. It allows users to create and manage isolated containers with their desired technology stacks, such as Node.js, Python, Rust, and more.
+DevBox is a powerful command-line interface tool built in Go using Cobra, Docker Engine API, and Bubbletea. It allows users to create and manage isolated containers with their desired technology stacks, such as Node.js, Python, Rust, and more.
 
 ## Features
 
@@ -16,42 +16,49 @@ DevControl is a powerful command-line interface tool built in Go using Cobra, Do
 
 ## Prerequisites
 
-Before using DevControl, ensure that you have the following installed:
+Before using DevBox, ensure that you have the following installed:
 
 - Docker
 
 ## Installation
 
-You can install DevControl by following these step
+You can install DevBox by following these step
 
 ### Linux and MacOS
+
 ```sh
-curl -fsSL https://raw.githubusercontent.com/harshau007/devcontrol/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/harshau007/devbox/main/install.sh | sh
 ```
 
 ### &emsp; `OR`
+
 Install via `makepkg`
+
 - Run inside `pkgbuild/`
+
 ```bash
-makepkg -si 
+makepkg -si
 ```
 
 ## Uninstallation
 
-You can uninstall DevControl by following these step
+You can uninstall DevBox by following these step
 
 ### Linux and MacOS
+
 ```sh
-sudo rm -rf /usr/bin/devctl /usr/bin/portdevctl /usr/bin/startdevctl /usr/local/share/devcontrol/
+sudo rm -rf /usr/bin/devctl /usr/bin/portdevctl /usr/bin/startdevctl /usr/local/share/devbox/
 ```
 
 ## Usage
 
-After installing DevControl, you can use the following commands:
+After installing DevBox, you can use the following commands:
+
 > **TIP:** Initial images creation may take some time depending on your internet speed.
 
 > **Demo video**:
-[![Watch the video](assets/devctl-h.png)](https://youtu.be/HBUJdv5mNqM?si=tfzS1vaJAhAlqzKA)
+> [![Watch the video](assets/devctl-h.png)](https://youtu.be/HBUJdv5mNqM?si=tfzS1vaJAhAlqzKA)
+
 ### `create`
 
 ```
@@ -65,9 +72,13 @@ Creates a new isolated container with the specified technology stack. Available 
 - `--name, -n` (string): Specify a name for the container.
 - `--volume, -v` (string): Specify the volume to mount.
 - `--package, -p` (string): Specify the technology to use.
+- `--port, -P` (string): Port to expose.
 - `--url, -u` (string): Specify the URL to clone the repository.
+- `--template, -t` (string): Create dev env using template.
 
-> **Note:** If you specify the `--url` option, DevControl will clone the repository and use the cloned repository as the volume. Default directory is `Desktop`
+> **Note:** If you specify the `--url` option, DevBox will clone the repository and use the cloned repository as the volume. Default directory is `Desktop`
+
+> **Note:** If you specify the `--url` option, DevBox will take some time to setup the environment
 
 ### `start`
 
@@ -76,6 +87,7 @@ devctl start [OPTIONS]
 ```
 
 Starts the specified container.
+
 #### Options
 
 - `--name, -n` (string): Specify a name for the container.
@@ -87,9 +99,11 @@ devctl stop [OPTIONS]
 ```
 
 Stops the specified running container.
+
 #### Options
 
 - `--name, -n` (string): Specify a name for the container.
+
 ### `ps`
 
 ```
@@ -100,7 +114,6 @@ Lists running containers and their status.
 
 - `--all, -a` : List all containers
 
-
 ### `rm`
 
 ```
@@ -108,6 +121,7 @@ devctl rm [OPTIONS] CONTAINER [CONTAINER...]
 ```
 
 Remove images.
+
 - `--force, -f` : Force remove containers.
 
 ### `images`
@@ -125,15 +139,16 @@ devctl rmi [OPTIONS] IMAGE [IMAGE...]
 ```
 
 Remove images.
+
 - `--force, -f` : Force remove images.
 
 ## Contributing
 
-Contributions to DevControl are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+Contributions to DevBox are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
 
 ## License
 
-DevControl is released under the [GNU General Public License](LICENSE).
+DevBox is released under the [GNU General Public License](LICENSE).
 
 ## Acknowledgments
 
