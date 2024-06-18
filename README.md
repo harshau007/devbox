@@ -78,7 +78,7 @@ Creates a new isolated container with the specified technology stack. Available 
 
 > **Note:** If you specify the `--url` option, DevBox will clone the repository and use the cloned repository as the volume. Default directory is `Desktop`
 
-> **Note:** If you specify the `--url` option, DevBox will take some time to setup the environment
+> **Note:** If you specify the `--template` option, DevBox will take some time to setup the environment
 
 ### `start`
 
