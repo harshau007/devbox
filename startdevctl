@@ -1,34 +1,33 @@
 #!/bin/bash
 
 container_name="$1"
+additional_ports="$2"
 
 image=$(docker inspect --format='{{.Config.Image}}' $container_name)
 
 volume=$(docker inspect --format='{{range .Mounts}}{{.Source}}{{end}}' $container_name)
 
-port=8080
 # Function to check if a port is in use
 is_port_in_use() {
     netstat -ltn | grep -q ":$1"
 }
 
-# Find the first available port starting from 8080
+port=8080
 while is_port_in_use $port; do
     port=$((port+1))
 done
 
-# Parse additional ports from the second argument
-IFS=',' read -ra additional_ports <<< "$2"
-for additional_port in "${additional_ports[@]}"; do
-    echo $additional_port
-    while is_port_in_use $additional_port; do
-        additional_port=$((additional_port+1))
+# Parse additional ports from the fourth argument
+IFS=',' read -ra additional_ports_array <<< "$additional_ports"
+for i in "${!additional_ports_array[@]}"; do
+    while is_port_in_use "${additional_ports_array[$i]}"; do
+        additional_ports_array[$i]=$((additional_ports_array[$i]+1))
     done
 done
 
 # Join the available ports into a comma-separated string
 ports_str="$port"
-for additional_port in "${additional_ports[@]}"; do
+for additional_port in "${additional_ports_array[@]}"; do
     ports_str="$ports_str,$additional_port"
 done
 
@@ -36,7 +35,7 @@ echo "Launching $container_name on ports $ports_str and mounting $volume"
 
 # Prepare -p options for Docker run
 port_mappings="-p $port:8080"
-for additional_port in "${additional_ports[@]}"; do
+for additional_port in "${additional_ports_array[@]}"; do
     port_mappings="$port_mappings -p $additional_port:$additional_port"
 done
 

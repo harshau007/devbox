@@ -23,6 +23,8 @@ var startCmd = &cobra.Command{
 	Short: "Start containers",
 	Run: func(cmd *cobra.Command, args []string) {
 		nameFlag, _ := cmd.Flags().GetString("name")
+		portFlag, _ := cmd.Flags().GetString("port")
+
 		if nameFlag == "" {
 			containerInfo, err := containerList()
 			if err != nil {
@@ -61,7 +63,16 @@ var startCmd = &cobra.Command{
 				_ = append(choicesContainers[:indexToRemove], choicesContainers[indexToRemove+1:]...)
 			}
 		}
-		_, err := startContainer(nameFlag)
+
+		if portFlag == "" {
+			fmt.Print("\nEnter the port you want to expose (default 3000): ")
+			_, err := fmt.Scanln(&portFlag)
+			if err != nil || portFlag == "" {
+				portFlag = "3000"
+			}
+		}
+
+		_, err := startContainer(nameFlag, portFlag)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -71,6 +82,7 @@ var startCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(startCmd)
 	startCmd.PersistentFlags().StringP("name", "n", "", "Name of the container")
+	startCmd.PersistentFlags().StringP("port", "P", "", "Port to expose")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -82,8 +94,8 @@ func init() {
 	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func startContainer(name string) (string, error) {
-	cmd := exec.Command("startdevctl", name)
+func startContainer(name string, port string) (string, error) {
+	cmd := exec.Command("startdevctl", name, port)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("Error executing the script: %v\n", err)
