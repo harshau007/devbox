@@ -181,7 +181,6 @@ var createcmd = &cobra.Command{
 			Template:   strings.ToLower(tempFlag),
 			Port:       portFlag,
 		}
-		fmt.Println(container)
 		_, err := createCodeInstance(container)
 		if err != nil {
 			fmt.Println(err)
@@ -217,7 +216,6 @@ func createCodeInstance(container CreateContainer) (string, error) {
 				os.MkdirAll(os.Getenv("HOME")+"/"+container.FolderPath, 0755)
 			}
 			cmd := exec.Command("portdevctl", container.Name, "nodelts", fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath), container.Port, container.Template)
-			fmt.Println(cmd)
 			output, err = cmd.CombinedOutput()
 			if err != nil {
 				errCh <- fmt.Errorf("error executing the script: %v", err)
@@ -253,7 +251,6 @@ func createCodeInstance(container CreateContainer) (string, error) {
 			}
 		} else {
 			isExists, err = exists(container.FolderPath)
-			fmt.Println(isExists)
 			if err != nil {
 				fmt.Println("Folder: ", err)
 			}
