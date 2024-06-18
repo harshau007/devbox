@@ -6,6 +6,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -54,7 +55,7 @@ func listContainers() error {
 	}
 	defer cli.Close()
 
-	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevControl"))
+	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevBox"))
 	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{Filters: filters})
 	if err != nil {
 		return err
@@ -64,7 +65,7 @@ func listContainers() error {
 		containerIDWidth = 12
 		imageWidth       = 20
 		createdWidth     = 20
-		statusWidth      = 20
+		statusWidth      = 15
 		portsWidth       = 20
 		namesWidth       = 20
 	)
@@ -75,9 +76,9 @@ func listContainers() error {
 		fmt.Println("No containers found.")
 		return nil
 	}
-	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+15))
 
-	fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+	fmt.Printf("   %-*s\t %-*s\t %-*s  %-*s %-*s %-*s %-*s\n",
 		containerIDWidth, "CONTAINER ID",
 		imageWidth, "IMAGE",
 		volumeWidth, "VOLUME",
@@ -85,12 +86,17 @@ func listContainers() error {
 		statusWidth, "STATUS",
 		portsWidth, "URL",
 		namesWidth, "NAMES")
-	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+15))
 
 	for _, container := range containers {
 		var url string
 		if len(container.Ports) > 0 {
-			url = fmt.Sprintf("http://%s:%d", container.Ports[0].IP, container.Ports[0].PublicPort)
+			for _, port := range container.Ports {
+				if strings.HasPrefix(strconv.Itoa(int(port.PublicPort)), "8") {
+					url = fmt.Sprintf("http://%s:%d", port.IP, port.PublicPort)
+					break
+				}
+			}
 		}
 		if url == "" {
 			url = "Not Available"
@@ -108,7 +114,7 @@ func listContainers() error {
 			names = truncateString(container.Names[0][1:], namesWidth)
 		}
 
-		fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+		fmt.Printf("   %-*s\t %-*s\t %-*s  %-*s %-*s %-*s %-*s\n",
 			containerIDWidth, containerID,
 			imageWidth, image,
 			volumeWidth, volume,
@@ -117,8 +123,9 @@ func listContainers() error {
 			portsWidth, url,
 			namesWidth, names,
 		)
-		fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
 	}
+
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+15))
 
 	return nil
 }
@@ -132,7 +139,7 @@ func listAllContainers() error {
 	defer cli.Close()
 
 	filters := filters.NewArgs(
-		filters.Arg("label", "createdBy=DevControl"),
+		filters.Arg("label", "createdBy=DevBox"),
 	)
 	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: true, Filters: filters})
 	if err != nil {
@@ -155,9 +162,9 @@ func listAllContainers() error {
 		return nil
 	}
 
-	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+15))
 
-	fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+	fmt.Printf("   %-*s\t %-*s\t %-*s  %-*s %-*s %-*s %-*s\n",
 		containerIDWidth, "CONTAINER ID",
 		imageWidth, "IMAGE",
 		volumeWidth, "VOLUME",
@@ -165,12 +172,17 @@ func listAllContainers() error {
 		statusWidth, "STATUS",
 		portsWidth, "URL",
 		namesWidth, "NAMES")
-	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+15))
 
 	for _, container := range containers {
 		var url string
 		if len(container.Ports) > 0 {
-			url = fmt.Sprintf("http://%s:%d", container.Ports[0].IP, container.Ports[0].PublicPort)
+			for _, port := range container.Ports {
+				if strings.HasPrefix(strconv.Itoa(int(port.PublicPort)), "8") {
+					url = fmt.Sprintf("http://%s:%d", port.IP, port.PublicPort)
+					break
+				}
+			}
 		}
 		if url == "" {
 			url = "Not Available"
@@ -188,7 +200,7 @@ func listAllContainers() error {
 			names = truncateString(container.Names[0][1:], namesWidth)
 		}
 
-		fmt.Printf("   %-*s\t %-*s %-*s\t %-*s\t %-*s\t %-*s\t %-*s\n",
+		fmt.Printf("   %-*s\t %-*s\t %-*s  %-*s %-*s %-*s %-*s\n",
 			containerIDWidth, containerID,
 			imageWidth, image,
 			volumeWidth, volume,
@@ -199,7 +211,7 @@ func listAllContainers() error {
 		)
 	}
 
-	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+11))
+	fmt.Println(strings.Repeat("-", containerIDWidth+imageWidth+volumeWidth+createdWidth+statusWidth+portsWidth+namesWidth+15))
 
 	return nil
 }

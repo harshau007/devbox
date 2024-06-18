@@ -1,5 +1,5 @@
  # Maintainer: Harsh Upadhyay amanupadhyay2004@gmail.com
-pkgname=devcontrol
+pkgname=DevBox
 pkgver=1.1.0
 pkgrel=1
 destname="/usr/local/share/${pkgname}"
@@ -21,6 +21,7 @@ package() {
   install -dm755 ${pkgdir}${destname}/
   cp -r ${srcdir}/${pkgname}/dockerfile ${pkgdir}${destname}/
   cp -r ${srcdir}/${pkgname}/settings.json ${pkgdir}${destname}/
+  cp -r ${srcdir}/${pkgname}/setup.sh ${pkgdir}${destname}/
 
   
   cd ${pkgname}

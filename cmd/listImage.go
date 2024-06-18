@@ -39,40 +39,40 @@ func init() {
 }
 
 func listImages() error {
-    ctx := context.Background()
-    cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-    if err != nil {
-        return err
-    }
-    defer cli.Close()
-	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevControl"))
-    images, err := cli.ImageList(ctx, imagetype.ListOptions{Filters: filters})
-    if err != nil {
-        return err
-    }
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevBox"))
+	images, err := cli.ImageList(ctx, imagetype.ListOptions{Filters: filters})
+	if err != nil {
+		return err
+	}
 
-    const (
-        repositoryWidth = 30
-        tagWidth        = 20
-        imageIDWidth    = 20
-        createdWidth    = 25
-        sizeWidth       = 15
-    )
+	const (
+		repositoryWidth = 30
+		tagWidth        = 20
+		imageIDWidth    = 20
+		createdWidth    = 25
+		sizeWidth       = 15
+	)
 
-    if len(images) == 0 {
-        fmt.Println("No images found.")
-        return nil
-    }
+	if len(images) == 0 {
+		fmt.Println("No images found.")
+		return nil
+	}
 
-    fmt.Println(strings.Repeat("-", repositoryWidth+tagWidth+imageIDWidth+createdWidth+sizeWidth+4))
-    fmt.Printf("   %-*s %-*s %-*s %-*s %-*s\n",
-        repositoryWidth, "REPOSITORY",
-        tagWidth, "TAG",
-        imageIDWidth, "IMAGE ID",
-        createdWidth, "CREATED",
-        sizeWidth, "SIZE")
-    fmt.Println(strings.Repeat("-", repositoryWidth+tagWidth+imageIDWidth+createdWidth+sizeWidth+4))
-    for _, image := range images {
+	fmt.Println(strings.Repeat("-", repositoryWidth+tagWidth+imageIDWidth+createdWidth+sizeWidth+4))
+	fmt.Printf("   %-*s %-*s %-*s %-*s %-*s\n",
+		repositoryWidth, "REPOSITORY",
+		tagWidth, "TAG",
+		imageIDWidth, "IMAGE ID",
+		createdWidth, "CREATED",
+		sizeWidth, "SIZE")
+	fmt.Println(strings.Repeat("-", repositoryWidth+tagWidth+imageIDWidth+createdWidth+sizeWidth+4))
+	for _, image := range images {
 		var imageName, tag string
 		if len(image.RepoDigests) > 0 && len(image.RepoTags) > 0 {
 			imageNameParts := strings.Split(image.RepoDigests[0], "@")
@@ -86,40 +86,40 @@ func listImages() error {
 			imageName = "<none>"
 			tag = "<none>"
 		}
-        imageID := truncateString(image.ID[7:17], imageIDWidth)
-        created := truncateString(time.Unix(image.Created, 0).Format("2006-01-02 15:04:05"), createdWidth)
-        size := truncateString(formatSize(image.Size), sizeWidth)
+		imageID := truncateString(image.ID[7:17], imageIDWidth)
+		created := truncateString(time.Unix(image.Created, 0).Format("2006-01-02 15:04:05"), createdWidth)
+		size := truncateString(formatSize(image.Size), sizeWidth)
 
-        fmt.Printf("   %-*s %-*s %-*s %-*s %-*s\n",
-            repositoryWidth, imageName,
-            tagWidth, tag,
-            imageIDWidth, imageID,
-            createdWidth, created,
-            sizeWidth, size,
-        )
-        fmt.Println(strings.Repeat("-", repositoryWidth+tagWidth+imageIDWidth+createdWidth+sizeWidth+4))
-    }
+		fmt.Printf("   %-*s %-*s %-*s %-*s %-*s\n",
+			repositoryWidth, imageName,
+			tagWidth, tag,
+			imageIDWidth, imageID,
+			createdWidth, created,
+			sizeWidth, size,
+		)
+		fmt.Println(strings.Repeat("-", repositoryWidth+tagWidth+imageIDWidth+createdWidth+sizeWidth+4))
+	}
 
-    return nil
+	return nil
 }
 
 func getTag(repoTag string) string {
-    parts := strings.SplitN(repoTag, ":", 2)
-    if len(parts) == 2 {
-        return parts[1]
-    }
-    return "latest"
+	parts := strings.SplitN(repoTag, ":", 2)
+	if len(parts) == 2 {
+		return parts[1]
+	}
+	return "latest"
 }
 
 func formatSize(size int64) string {
-    const unit = 1024
-    if size < unit {
-        return fmt.Sprintf("%d B", size)
-    }
-    div, exp := int64(unit), 0
-    for n := size / unit; n >= unit; n /= unit {
-        div *= unit
-        exp++
-    }
-    return fmt.Sprintf("%.1f %cB", float64(size)/float64(div), "KMGTPE"[exp])
+	const unit = 1024
+	if size < unit {
+		return fmt.Sprintf("%d B", size)
+	}
+	div, exp := int64(unit), 0
+	for n := size / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(size)/float64(div), "KMGTPE"[exp])
 }

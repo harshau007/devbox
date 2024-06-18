@@ -1,6 +1,3 @@
-/*
-Copyright © 2024 Harsh Upadhyay amanupadhyay2004@gmail.com
-*/
 package cmd
 
 import (
@@ -17,16 +14,21 @@ import (
 )
 
 type CreateContainer struct {
-    Name     string
-    Package  string
-    FolderPath string
+	Name       string
+	Package    string
+	FolderPath string
+	Template   string
+	Port       string
 }
 
-var choices = []string{"NodeLTS", "Node18", "Node20", "Python", "Rust", "Go", "Java8", "Java11", "Java17", "Java20", "Java21"}
+var packageChoices = []string{"NodeLTS", "Node18", "Node20", "Python", "Rust", "Go", "Java8", "Java11", "Java17", "Java20", "Java21"}
+var templateChoices = []string{"next-js", "next-ts", "nest"}
 
 type model struct {
-	cursor int
-	choice string
+	cursor  int
+	choice  string
+	choices []string
+	mode    string
 }
 
 var Dir = "Desktop"
@@ -43,19 +45,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
-			m.choice = choices[m.cursor]
+			m.choice = m.choices[m.cursor]
 			return m, tea.Quit
 
 		case "down", "j":
 			m.cursor++
-			if m.cursor >= len(choices) {
+			if m.cursor >= len(m.choices) {
 				m.cursor = 0
 			}
 
 		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
-				m.cursor = len(choices) - 1
+				m.cursor = len(m.choices) - 1
 			}
 		}
 	}
@@ -65,15 +67,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	s := strings.Builder{}
-	s.WriteString("Which package would you like?\n\n")
+	s.WriteString(fmt.Sprintf("Which %s would you like?\n\n", m.mode))
 
-	for i := 0; i < len(choices); i++ {
+	for i := 0; i < len(m.choices); i++ {
 		if m.cursor == i {
 			s.WriteString("(*) ")
 		} else {
 			s.WriteString("( ) ")
 		}
-		s.WriteString(choices[i])
+		s.WriteString(m.choices[i])
 		s.WriteString("\n")
 	}
 	s.WriteString("\n(press q to quit)\n")
@@ -89,6 +91,8 @@ var createcmd = &cobra.Command{
 		pkgFlag, _ := cmd.Flags().GetString("package")
 		volFlag, _ := cmd.Flags().GetString("volume")
 		urlFlag, _ := cmd.Flags().GetString("url")
+		tempFlag, _ := cmd.Flags().GetString("template")
+		portFlag, _ := cmd.Flags().GetString("port")
 
 		if nameFlag == "" {
 			fmt.Print("Enter the name of the container: ")
@@ -105,14 +109,14 @@ var createcmd = &cobra.Command{
 				}
 				fmt.Println("Cloning repository " + name + " to " + os.Getenv("HOME") + "/" + Dir + "/" + name)
 
-				err = os.MkdirAll(os.Getenv("HOME")+ "/" + Dir + "/" + name, 0755)
+				err = os.MkdirAll(os.Getenv("HOME")+"/"+Dir+"/"+name, 0755)
 
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
 				}
 
-				cmd := exec.Command("git", "clone", urlFlag, os.Getenv("HOME")+ "/" + Dir + "/" + name)  
+				cmd := exec.Command("git", "clone", urlFlag, os.Getenv("HOME")+"/"+Dir+"/"+name)
 				_, err = cmd.CombinedOutput()
 
 				if err != nil {
@@ -127,25 +131,57 @@ var createcmd = &cobra.Command{
 			}
 		}
 
-		if pkgFlag == "" {
-			p := tea.NewProgram(model{})
+		if pkgFlag == "" && tempFlag == "" {
+			var selection string
+			fmt.Print("Do you want to proceed with a package or a template? (package/template): ")
+			fmt.Scanln(&selection)
 
-			m, err := p.Run()
-			if err != nil {
-				fmt.Println(err)
+			if strings.ToLower(selection) == "package" {
+				p := tea.NewProgram(model{choices: packageChoices, mode: "package"})
+
+				m, err := p.Run()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+
+				if m, ok := m.(model); ok && m.choice != "" {
+					pkgFlag = strings.ToLower(m.choice)
+				}
+			} else if strings.ToLower(selection) == "template" {
+				p := tea.NewProgram(model{choices: templateChoices, mode: "template"})
+
+				m, err := p.Run()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+
+				if m, ok := m.(model); ok && m.choice != "" {
+					tempFlag = strings.ToLower(m.choice)
+				}
+			} else {
+				fmt.Println("Invalid selection")
 				os.Exit(1)
 			}
-		
-			if m, ok := m.(model); ok && m.choice != "" {
-				pkgFlag = strings.ToLower(m.choice)
+		}
+
+		if portFlag == "" {
+			fmt.Print("\nEnter the port you want to expose (default 3000): ")
+			_, err := fmt.Scanln(&portFlag)
+			if err != nil || portFlag == "" {
+				portFlag = "3000"
 			}
 		}
 
 		var container CreateContainer = CreateContainer{
-			Name:     strings.ToLower(nameFlag),
-			Package:  strings.ToLower(pkgFlag),
+			Name:       strings.ToLower(nameFlag),
+			Package:    strings.ToLower(pkgFlag),
 			FolderPath: volFlag,
+			Template:   strings.ToLower(tempFlag),
+			Port:       portFlag,
 		}
+		fmt.Println(container)
 		_, err := createCodeInstance(container)
 		if err != nil {
 			fmt.Println(err)
@@ -156,71 +192,133 @@ var createcmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(createcmd)
-	createcmd.PersistentFlags().StringP("name", "n", "","Name of the container")
-	createcmd.PersistentFlags().StringP("package", "p", "","Name of the package")
-	createcmd.PersistentFlags().StringP("volume", "v", "","Path to the volume")
-	createcmd.PersistentFlags().StringP("url", "u", "","URL to the repository")
+	createcmd.PersistentFlags().StringP("name", "n", "", "Name of the container")
+	createcmd.PersistentFlags().StringP("package", "p", "", "Name of the package")
+	createcmd.PersistentFlags().StringP("volume", "v", "", "Path to the volume")
+	createcmd.PersistentFlags().StringP("url", "u", "", "URL to the repository")
+	createcmd.PersistentFlags().StringP("template", "t", "", "Template")
+	createcmd.PersistentFlags().StringP("port", "P", "", "Port to expose")
 }
 
 func createCodeInstance(container CreateContainer) (string, error) {
-    errCh := make(chan error)
-    containerCh := make(chan string)
+	errCh := make(chan error)
+	containerCh := make(chan string)
 
-    go func() {
-        cmd := exec.Command("portdevctl", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath))
-        output, err := cmd.CombinedOutput()
-        if err != nil {
-            errCh <- fmt.Errorf("error executing the script: %v", err)
-            return
-        }
+	go func() {
+		var output []byte
+		var err error
+		var isExists bool
+		if strings.Contains(container.Template, "next-js") {
+			isExists, err = exists(container.FolderPath)
+			if err != nil {
+				fmt.Println("Folder: ", err)
+			}
+			if !isExists {
+				os.MkdirAll(os.Getenv("HOME")+"/"+container.FolderPath, 0755)
+			}
+			cmd := exec.Command("portdevctl", container.Name, "nodelts", fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath), container.Port, container.Template)
+			fmt.Println(cmd)
+			output, err = cmd.CombinedOutput()
+			if err != nil {
+				errCh <- fmt.Errorf("error executing the script: %v", err)
+				return
+			}
+		} else if strings.Contains(container.Template, "next-ts") {
+			isExists, err = exists(container.FolderPath)
+			if err != nil {
+				fmt.Println("Folder: ", err)
+			}
+			if !isExists {
+				os.MkdirAll(os.Getenv("HOME")+"/"+container.FolderPath, 0755)
+			}
+			cmd := exec.Command("portdevctl", container.Name, "nodelts", fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath), container.Port, container.Template)
+			output, err = cmd.CombinedOutput()
+			if err != nil {
+				errCh <- fmt.Errorf("error executing the script: %v", err)
+				return
+			}
+		} else if strings.Contains(container.Template, "nest") {
+			isExists, err = exists(container.FolderPath)
+			if err != nil {
+				fmt.Println("Folder: ", err)
+			}
+			if !isExists {
+				os.MkdirAll(os.Getenv("HOME")+"/"+container.FolderPath, 0755)
+			}
+			cmd := exec.Command("portdevctl", container.Name, "nodelts", fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath), container.Port, container.Template)
+			output, err = cmd.CombinedOutput()
+			if err != nil {
+				errCh <- fmt.Errorf("error executing the script: %v", err)
+				return
+			}
+		} else {
+			isExists, err = exists(container.FolderPath)
+			fmt.Println(isExists)
+			if err != nil {
+				fmt.Println("Folder: ", err)
+			}
+			if !isExists {
+				os.MkdirAll(os.Getenv("HOME")+"/"+container.FolderPath, 0755)
+			}
+			cmd := exec.Command("portdevctl", container.Name, container.Package, fmt.Sprintf("%s/%s", os.Getenv("HOME"), container.FolderPath), container.Port, "none")
+			output, err = cmd.CombinedOutput()
+			if err != nil {
+				errCh <- fmt.Errorf("error executing the script: %v", err)
+				return
+			}
 
-        outputLines := strings.Split(strings.TrimSpace(string(output)), "\n")
-        containerId := outputLines[len(outputLines)-1]
+		}
+		outputLines := strings.Split(strings.TrimSpace(string(output)), "\n")
+		containerId := outputLines[len(outputLines)-1]
 
-        containerCh <- containerId[:10]
-    }()
+		containerCh <- containerId[:10]
+	}()
 
 	fmt.Print("\n\t")
-    s := newspinner.New(newspinner.CharSets[9], 100*time.Millisecond)
-    s.Writer = os.Stderr
-    s.Suffix = " Creating Code Instance...\n"
-    s.Start()
-    defer s.Stop()
+	s := newspinner.New(newspinner.CharSets[9], 100*time.Millisecond)
+	s.Writer = os.Stderr
+	s.Suffix = " Creating Code Instance...\n"
+	s.Start()
+	defer s.Stop()
 
-    select {
-    case err := <-errCh:
-        s.Stop()
-        return "", err
-    case containerId := <-containerCh:
-        s.Stop()
-        return containerId, nil
-    }
+	select {
+	case err := <-errCh:
+		s.Stop()
+		return "", err
+	case containerId := <-containerCh:
+		s.Stop()
+		return containerId, nil
+	}
 }
 
 func getRepoName(repoURL string) (string, error) {
-    u, err := url.Parse(repoURL)
-    if err != nil {
-        return "", err
-    }
+	u, err := url.Parse(repoURL)
+	if err != nil {
+		return "", err
+	}
 
-    host := u.Hostname()
-    if !strings.HasSuffix(host, "github.com") && !strings.HasSuffix(host, "gitlab.com") {
-        return "", fmt.Errorf("invalid repository URL: %s", repoURL)
-    }
+	host := u.Hostname()
+	if !strings.HasSuffix(host, "github.com") && !strings.HasSuffix(host, "gitlab.com") {
+		return "", fmt.Errorf("invalid repository URL: %s", repoURL)
+	}
 
-    if !strings.HasPrefix(u.Path, "/") {
-        return "", fmt.Errorf("invalid repository URL: %s", repoURL)
-    }
+	if !strings.HasPrefix(u.Path, "/") || !strings.Contains(u.Path, "/") {
+		return "", fmt.Errorf("invalid repository URL: %s", repoURL)
+	}
 
-    pathComponents := strings.Split(u.Path, "/")
+	pathParts := strings.Split(u.Path, "/")
+	repoName := strings.TrimSuffix(pathParts[len(pathParts)-1], ".git")
 
-    if len(pathComponents) < 3 {
-        return "", fmt.Errorf("invalid repository URL: %s", repoURL)
-    }
+	return repoName, nil
+}
 
-    if strings.HasSuffix(host, "github.com") {
-        return pathComponents[2], nil
-    } else {
-        return pathComponents[3], nil
-    }
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }

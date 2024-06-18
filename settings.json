@@ -1,7 +1,7 @@
 {
-    "workbench.colorTheme": "Default Dark Modern",
-    "editor.wordWrap": "on",
-    "files.autoSave": "afterDelay",
-    "editor.cursorSmoothCaretAnimation": "on",
-    "workbench.startupEditor": "none"
+  "workbench.colorTheme": "Default Dark Modern",
+  "editor.wordWrap": "on",
+  "files.autoSave": "afterDelay",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "workbench.startupEditor": "none"
 }

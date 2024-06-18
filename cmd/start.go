@@ -107,7 +107,7 @@ func containerList() ([]containerDetail, error) {
 	defer cli.Close()
 
 	filters := filters.NewArgs(
-		filters.Arg("label", "createdBy=DevControl"),
+		filters.Arg("label", "createdBy=DevBox"),
 		filters.Arg("status", "exited"),
 	)
 	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{Filters: filters})

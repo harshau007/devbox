@@ -2,11 +2,15 @@ FROM ubuntu:20.04
 
 LABEL maintainer="https://github.com/harshau007"
 
-LABEL createdBy="DevControl"
+LABEL createdBy="DevBox"
 
 RUN apt-get update && apt-get install -y curl ca-certificates software-properties-common
 
 ARG ADDITIONAL_PACKAGES
+
+ARG ADDITIONAL_PORT
+
+ARG TEMPLATE_NAME
 
 RUN if [ -n "$ADDITIONAL_PACKAGES" ]; then \
     case "$ADDITIONAL_PACKAGES" in \
@@ -38,7 +42,7 @@ RUN if [ -n "$ADDITIONAL_PACKAGES" ]; then \
     "java21") \
         apt-get install -y openjdk-21-jdk ;; \
     *) \
-        apt-get install -y $ADDITIONAL_PACKAGES ;; \
+        echo $ADDITIONAL_PACKAGES ;; \
     esac; \
 fi
 
@@ -46,9 +50,13 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 COPY settings.json /root/.local/share/code-server/User/settings.json
 
-EXPOSE 8080
+EXPOSE 8080 ${ADDITIONAL_PORT}
 
 WORKDIR /home/coder
 
+COPY setup.sh /usr/local/bin/setup.sh
+
+RUN chmod +x /usr/local/bin/setup.sh
+
 # Start code-server
-CMD ["code-server", "--bind-addr", "0.0.0.0:8080", ".", "--auth", "none"]
+ENTRYPOINT [ "/usr/local/bin/setup.sh" ]

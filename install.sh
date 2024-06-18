@@ -35,6 +35,14 @@ check_installations() {
         echo -e "${GREEN}Docker is installed.${NC}"
     fi
 
+    if ! command -v go >/dev/null 2>&1; then
+        echo -e "${RED}Go is not installed.${NC}"
+        echo "Please install Go from https://golang.org/dl/"
+        INSTALL_GO=true
+    else
+        echo -e "${GREEN}Go is installed.${NC}"
+    fi
+
     if [ "$INSTALL_GO" = true ] || [ "$INSTALL_DOCKER" = true ]; then
         echo -e "\n${YELLOW}Please install the missing dependencies and run the script again.${NC}"
         exit 1
@@ -71,12 +79,12 @@ setup_repository() {
         remove_repo
         exit 1
     }
-    sudo mkdir -p /usr/local/share/devcontrol/ || {
+    sudo mkdir -p /usr/local/share/devbox/ || {
         echo -e "${RED}Failed to create directory for config files.${NC}"
         remove_repo
         exit 1
     }
-    sudo cp dockerfile settings.json /usr/local/share/devcontrol/ || {
+    sudo cp dockerfile settings.json setup.sh /usr/local/share/devbox/ || {
         echo -e "${RED}Failed to copy config files.${NC}"
         remove_repo
         exit 1

@@ -1,34 +1,73 @@
 #!/bin/bash
 
-# Check if a name is provided as an argument
-if [ -n "$1" ]; then
-    container_name="$1"
-else
-    container_name="vscode-server-$(head /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)"
+# Function to display usage
+usage() {
+    echo "Usage: $0 <container_name> <technology> <volume> <additional_ports> <template_name>"
+    echo "Example: $0 my-container nodejs /path/to/volume 3001,3002 none"
+    echo "         $0 my-container any /path/to/volume 4000 next-js"
+    exit 1
+}
+
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 5 ]; then
+    usage
 fi
 
+# Assign arguments to variables
+container_name="$1"
+technology="$2"
+volume="$3"
+additional_ports="$4"
+template_name="$5"
+
+# Generate image name
 image_name="$container_name-$(head /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)"
 
-cp -r /usr/local/share/devcontrol/settings.json .
+# Copy settings.json
+cp -r /usr/local/share/devbox/settings.json /usr/local/share/devbox/setup.sh  .
 
-docker build --build-arg ADDITIONAL_PACKAGES="$2" . -t $image_name -f /usr/local/share/devcontrol/dockerfile
-
-# Start from port 8080
-port=8080
+# Build Docker image
+docker build --build-arg ADDITIONAL_PACKAGES="$technology" --build-arg ADDITIONAL_PORT="$additional_ports" --build-arg TEMPLATE_NAME="$template_name" . -t "$image_name" -f /usr/local/share/devbox/dockerfile
 
 # Function to check if a port is in use
 is_port_in_use() {
-    netstat -ltn | grep -q ":$port"
+    netstat -ltn | grep -q ":$1"
 }
 
-# Find an available port
+# Find the first available port starting from 8080
+port=8080
 while is_port_in_use $port; do
     port=$((port+1))
 done
 
-echo "Launching $container_name on port $port and mounting $3"
+# Parse additional ports from the fourth argument
+IFS=',' read -ra additional_ports_array <<< "$additional_ports"
+for i in "${!additional_ports_array[@]}"; do
+    while is_port_in_use "${additional_ports_array[$i]}"; do
+        additional_ports_array[$i]=$((additional_ports_array[$i]+1))
+    done
+done
 
-# Run the Docker container with the available port
-docker run --name "$container_name" -p $port:8080 -v "$3:/home/coder" --privileged -d $image_name
+# Join the available ports into a comma-separated string
+ports_str="$port"
+for additional_port in "${additional_ports_array[@]}"; do
+    ports_str="$ports_str,$additional_port"
+done
 
-rm -rf settings.json
+echo "Launching $container_name on ports $ports_str and mounting $volume"
+
+# Prepare -p options for Docker run
+port_mappings="-p $port:8080"
+for additional_port in "${additional_ports_array[@]}"; do
+    port_mappings="$port_mappings -p $additional_port:$additional_port"
+done
+
+# Run the Docker container with the available ports
+docker run --name "$container_name" $port_mappings -v "$volume:/home/coder" --privileged -d "$image_name" "$template_name"
+
+# Clean up
+rm -rf settings.json setup.sh
+
+echo "Container $container_name started successfully with port mapping $port_mappings."
+
+# ./newscript.sh mytestcont1 nodelts $HOME/Desktop/newtest/ 3000 true next-js

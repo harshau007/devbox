@@ -162,7 +162,7 @@ func stopcontainer(name string) (string, error) {
 			return "", err
 		}
 	}
-	return "\nStopped container: " + contInfo.ID[:10] + "\n", nil
+	return "\nStopped container: " + contInfo.ID[:10], nil
 }
 
 func containerNames() ([]containerDetail, error) {
@@ -174,7 +174,7 @@ func containerNames() ([]containerDetail, error) {
 	}
 	defer cli.Close()
 
-	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevControl"))
+	filters := filters.NewArgs(filters.Arg("label", "createdBy=DevBox"))
 	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{Filters: filters})
 	if err != nil {
 		return nil, err
