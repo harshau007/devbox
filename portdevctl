@@ -23,9 +23,6 @@ template_name="$5"
 # Generate image name
 image_name="$container_name-$(head /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)"
 
-# Copy settings.json
-cp -r /usr/local/share/devbox/settings.json /usr/local/share/devbox/setup.sh  .
-
 # Build Docker image
 docker buildx build --no-cache --build-arg ADDITIONAL_PACKAGES="$technology" --build-arg ADDITIONAL_PORT="$additional_ports" --build-arg TEMPLATE_NAME="$template_name" -f /usr/local/share/devbox/dockerfile /usr/local/share/devbox/ -t "$image_name"
 
@@ -65,9 +62,4 @@ done
 # Run the Docker container with the available ports
 docker run --name "$container_name" $port_mappings -v "$volume:/home/coder" --privileged -d "$image_name" "$template_name"
 
-# Clean up
-rm -rf settings.json setup.sh
-
 echo "Container $container_name started successfully with port mapping $port_mappings."
-
-# ./newscript.sh mytestcont1 nodelts $HOME/Desktop/newtest/ 3000 true next-js
