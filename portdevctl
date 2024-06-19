@@ -27,7 +27,7 @@ image_name="$container_name-$(head /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | 
 cp -r /usr/local/share/devbox/settings.json /usr/local/share/devbox/setup.sh  .
 
 # Build Docker image
-docker build --no-cache --build-arg ADDITIONAL_PACKAGES="$technology" --build-arg ADDITIONAL_PORT="$additional_ports" --build-arg TEMPLATE_NAME="$template_name" . -t "$image_name" -f /usr/local/share/devbox/dockerfile
+docker buildx build --no-cache --build-arg ADDITIONAL_PACKAGES="$technology" --build-arg ADDITIONAL_PORT="$additional_ports" --build-arg TEMPLATE_NAME="$template_name" -f /usr/local/share/devbox/dockerfile /usr/local/share/devbox/ -t "$image_name"
 
 # Function to check if a port is in use
 is_port_in_use() {

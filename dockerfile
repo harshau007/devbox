@@ -1,7 +1,6 @@
-FROM ubuntu:20.04
+FROM debian:bullseye-slim
 
 LABEL maintainer="https://github.com/harshau007"
-
 LABEL createdBy="DevBox"
 
 RUN apt-get update && apt-get install -y curl ca-certificates software-properties-common
@@ -46,11 +45,14 @@ RUN if [ -n "$ADDITIONAL_PACKAGES" ]; then \
     esac; \
 fi
 
-RUN curl -fsSL https://code-server.dev/install.sh | sh
+
+RUN curl -fsSL https://code-server.dev/install.sh | sh \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY settings.json /root/.local/share/code-server/User/settings.json
 
-EXPOSE 8080 ${ADDITIONAL_PORT}
+EXPOSE 8080
 
 WORKDIR /home/coder
 

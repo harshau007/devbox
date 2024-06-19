@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Version tag'
+        description: "Version tag"
         required: true
         type: string
 
@@ -23,15 +23,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Building devcontrol Tar file
+      - name: Building devbox Tar file
         run: |
           cd ..
-          touch devcontrol-${{ inputs.tag }}.tar.gz
-          tar -czf devcontrol-${{ inputs.tag }}.tar.gz devcontrol/
+          touch devbox-${{ inputs.tag }}.tar.gz
+          tar -czf devbox-${{ inputs.tag }}.tar.gz devbox/
           touch checksum
-          sha256sum devcontrol-${{ inputs.tag }}.tar.gz > checksum
-          mv checksum devcontrol/
-          mv devcontrol-${{ inputs.tag }}.tar.gz devcontrol/
+          sha256sum devbox-${{ inputs.tag }}.tar.gz > checksum
+          mv checksum devbox/
+          mv devbox-${{ inputs.tag }}.tar.gz devbox/
 
       - name: Checking if release with date tag exist
         run: |
@@ -62,7 +62,7 @@ jobs:
           gh release delete latest
       - name: Release Tar File
         run: |
-          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "DevControl"
+          gh release create 'v${{ inputs.tag }}' *tar.gz checksum --title "DevBox"
       - name: Release Tar File with latest
         run: |
-          gh release create latest *tar.gz checksum --latest --title "DevControl"
+          gh release create latest *tar.gz checksum --latest --title "DevBox"

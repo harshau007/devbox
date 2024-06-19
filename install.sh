@@ -35,6 +35,14 @@ check_installations() {
         echo -e "${GREEN}Docker is installed.${NC}"
     fi
 
+    if ! docker buildx version >/dev/null 2>&1; then
+        echo -e "${RED}Docker Buildx is not installed or not configured.${NC}"
+        echo "Please install Docker Buildx from https://docs.docker.com/buildx/working-with-buildx/"
+        INSTALL_BUILDX=true
+    else
+        echo -e "${GREEN}Docker Buildx is installed.${NC}"
+    fi
+
     if ! command -v go >/dev/null 2>&1; then
         echo -e "${RED}Go is not installed.${NC}"
         echo "Please install Go from https://golang.org/dl/"
@@ -43,7 +51,7 @@ check_installations() {
         echo -e "${GREEN}Go is installed.${NC}"
     fi
 
-    if [ "$INSTALL_GO" = true ] || [ "$INSTALL_DOCKER" = true ]; then
+    if [ "$INSTALL_DOCKER" = true ] || [ "$INSTALL_BUILDX" = true ] || [ "$INSTALL_GO" = true ]; then
         echo -e "\n${YELLOW}Please install the missing dependencies and run the script again.${NC}"
         exit 1
     fi
@@ -52,8 +60,8 @@ check_installations() {
 # Function to clone repository and set it up
 setup_repository() {
     echo -e "\n${CYAN}Cloning repository...${NC}"
-    REPO_DIR="$HOME/.devcontrol"
-    git clone https://github.com/harshau007/devcontrol.git "$REPO_DIR" || {
+    REPO_DIR="$HOME/.devbox"
+    git clone https://github.com/harshau007/devbox.git "$REPO_DIR" || {
         echo -e "${RED}Failed to clone repository.${NC}"
         exit 1
     }
